@@ -1,0 +1,85 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../views/**/*.blade.php';
+@source '../../app/**/*.php';
+
+@theme {
+    --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+    /* Aksen hijau tua ALMEGA */
+    --color-brand-50: #f0f7f3;
+    --color-brand-100: #dcede3;
+    --color-brand-200: #bbdbc9;
+    --color-brand-500: #2f7d55;
+    --color-brand-600: #22663f;
+    --color-brand-700: #1b5434;
+    --color-brand-800: #16432b;
+    --color-brand-900: #123824;
+}
+
+@layer base {
+    body {
+        @apply bg-gray-50 text-gray-800 antialiased;
+    }
+    [x-cloak] {
+        display: none !important;
+    }
+}
+
+@utility btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60;
+}
+
+@utility btn-primary {
+    @apply btn bg-brand-700 text-white hover:bg-brand-800;
+}
+
+@utility btn-secondary {
+    @apply btn border border-gray-300 bg-white text-gray-700 hover:bg-gray-50;
+}
+
+@utility btn-danger {
+    @apply btn bg-red-600 text-white hover:bg-red-700;
+}
+
+@utility btn-sm {
+    @apply px-3 py-1.5 text-xs;
+}
+
+@utility card {
+    @apply rounded-xl border border-gray-200 bg-white shadow-sm;
+}
+
+@utility form-label {
+    @apply mb-1 block text-sm font-medium text-gray-700;
+}
+
+@utility form-input {
+    @apply block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-200 focus:outline-none disabled:bg-gray-100;
+}
+
+@utility form-error {
+    @apply mt-1 text-xs text-red-600;
+}
+
+@utility form-hint {
+    @apply mt-1 text-xs text-gray-500;
+}
+
+@utility table-base {
+    @apply min-w-full divide-y divide-gray-200 text-sm;
+}
+
+.table-base thead th {
+    @apply bg-gray-50 px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500 uppercase;
+}
+
+.table-base tbody td {
+    @apply px-4 py-3 align-top text-gray-700;
+}
+
+.table-base tbody tr {
+    @apply hover:bg-gray-50;
+}
