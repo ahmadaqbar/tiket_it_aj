@@ -17,16 +17,34 @@
         @endif
     </div>
 
-    @isset($stats)
-        <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <x-stat-card label="Total Tiket" :value="$stats['total']" />
-            <x-stat-card label="Tiket Baru" :value="$stats['new']" tone="blue" />
-            <x-stat-card label="Dalam Proses" :value="$stats['in_progress']" tone="amber" />
-            <x-stat-card label="Selesai" :value="$stats['done']" tone="green" />
+    <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <x-stat-card label="Total Tiket" :value="$stats['total']" />
+        <x-stat-card label="Tiket Baru" :value="$stats['new']" tone="blue" />
+        <x-stat-card label="Dalam Proses" :value="$stats['in_progress']" tone="amber" hint="Termasuk pending" />
+        <x-stat-card label="Selesai" :value="$stats['done']" tone="green" hint="Resolved & closed" />
+    </div>
+
+    <div class="card mt-6">
+        <div class="flex items-center justify-between border-b border-gray-100 px-5 py-3">
+            <h2 class="text-sm font-semibold text-gray-900">Tiket Terbaru</h2>
+            <a href="{{ route('user.tickets.index') }}" class="text-xs font-medium text-brand-700 hover:underline">Lihat semua</a>
         </div>
-    @else
-        <div class="card">
-            <x-empty-state icon="ticket" message="Modul tiket sedang disiapkan (Sprint 2). Untuk sementara, silakan hubungi Divisi IT secara langsung." />
-        </div>
-    @endisset
+        @if ($recent->isEmpty())
+            <x-empty-state icon="ticket" message="Belum ada laporan. Tekan Buat Laporan bila ada kendala IT." />
+        @else
+            <ul class="divide-y divide-gray-100">
+                @foreach ($recent as $ticket)
+                    <li>
+                        <a href="{{ route('user.tickets.show', $ticket) }}" class="flex items-center justify-between gap-3 px-5 py-3 hover:bg-gray-50">
+                            <span class="min-w-0">
+                                <span class="block truncate text-sm font-medium text-gray-900">{{ $ticket->title }}</span>
+                                <span class="block font-mono text-xs text-gray-500">{{ $ticket->ticket_number }} · {{ $ticket->created_at->diffForHumans() }}</span>
+                            </span>
+                            <x-status-badge :status="$ticket->status" class="shrink-0" />
+                        </a>
+                    </li>
+                @endforeach
+            </ul>
+        @endif
+    </div>
 </x-layouts::app>

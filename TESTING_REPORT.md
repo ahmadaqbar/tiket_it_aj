@@ -58,3 +58,29 @@
 
 - Performance test dengan volume tiket (Sprint 7)
 - Uji di hosting aktual (Sprint 8)
+
+## Phase 1a + 1b — Perbaikan BUG-01 & Core Ticketing (2026-11-22)
+
+**Hasil: 120 test · 0 gagal** (`php artisan test`, MariaDB 10.11). Baseline sebelum perubahan: 76/76 lulus.
+
+| Suite | Jumlah | Hal yang diverifikasi |
+|---|---|---|
+| Feature/AuditLogTest (tambahan) | 2 | Regression BUG-01: nilai setara (0 vs false) tidak tercatat sebagai perubahan; perubahan nyata tetap tercatat dengan nilai lama/baru. **Terbukti gagal di kode lama, lulus setelah perbaikan.** |
+| Feature/Ticket/TicketCreationTest | 15 | Form dengan unit terisi; tiket dibuat (status NEW, prioritas default Sedang, public_id ULID, nomor, history CREATED, audit `ticket.created`); due date SLA; validasi wajib; **user tidak bisa melapor untuk unit lain**; unit/kategori nonaktif ditolak; subkategori harus sesuai kategori; IT tidak memakai form user; multi-unit; rate limit 10/menit; dashboard user memakai hitungan nyata; lampiran tersimpan privat; **file berbahaya ditolak berdasarkan isi** (PHP, HTML berekstensi .jpg, SVG); ekstensi simpan dari isi file; batas ukuran & jumlah dari settings |
+| Feature/Ticket/TicketNumberingTest | 7 | Format `IT-DR-20261114-001`; sequence per unit per hari & reset harian; >999 menjadi 4 digit; **sequence ikut rollback bila pembuatan gagal**; penomoran di luar transaksi ditolak; nomor tidak dipakai ulang (soft delete); prefix dapat dikonfigurasi, default tetap `IT` |
+| Feature/Ticket/TicketPrivacyTest | 8 | Pemilik melihat tiketnya; **user lain (unit sama) mendapat 404**; id numerik tidak bisa dipakai di URL; daftar/pencarian/dashboard hanya tiket sendiri; riwayat hanya CLOSED; unduh lampiran hanya pemilik/IT/IT Admin, tamu diarahkan ke login; lampiran INTERNAL tersembunyi dari pemilik; header aman (`nosniff`, content-type) |
+| Feature/Admin/CategoryAndSlaTest | 11 | Seeder 8 kategori/39 subkategori; hanya IT Admin; CRUD + audit; nama unik; **kategori/subkategori terpakai tidak bisa dihapus**; yang belum terpakai bisa dihapus; nama subkategori unik per kategori; subkategori nonaktif hilang dari form; perubahan SLA hanya untuk tiket baru + audit; validasi SLA; SLA nonaktif → tanpa due date |
+
+### Catatan Pengujian
+- `UploadedFile::fake()` melaporkan MIME dari **nama** file sehingga tidak dapat menguji file palsu. Test keamanan upload memakai file temp sungguhan (deteksi isi via finfo, sama dengan production).
+- Konkurensi penomoran tidak dapat diuji paralel di PHPUnit. Jaminannya berasal dari row lock `SELECT … FOR UPDATE` + UNIQUE (`unit_id`, `ticket_date`) + UNIQUE `ticket_number`. Uji beban paralel dijadwalkan di Phase 9.
+- Migration Phase 1b dijalankan **secara inkremental** pada database dev yang sudah berisi data Sprint 1 (tanpa `migrate:fresh`): sukses, data lama utuh.
+
+### Pengujian Browser (Playwright)
+| Skenario | Hasil |
+|---|---|
+| User (iPhone 13) membuat laporan: subkategori terfilter sesuai kategori, prioritas Tinggi, lampiran PNG | ✅ nomor `IT-DR-20261122-001` |
+| Detail tiket: badge status/prioritas, lampiran "Lihat" (inline 200 `image/png`) & "Unduh", riwayat | ✅ |
+| Dashboard user & Tiket Saya dengan data nyata | ✅ |
+| IT Admin: dashboard IT (hitungan per status), Category Management, SLA Settings | ✅ |
+| Error JavaScript | Tidak ada |

@@ -49,8 +49,8 @@ Audit menemukan core ticketing **belum ada**, sehingga Phase 1 diperluas.
 | Phase | Lingkup | Bergantung pada | Status |
 |---|---|---|---|
 | 0 | Audit: `PROJECT_AUDIT.md`, `PROJECT_STATUS.md`, rencana ini | — | ✅ |
-| 1a | Perbaikan BUG-01 audit log | 0 | lihat PROJECT_STATUS |
-| 1b | Core ticketing: kategori/subkategori, SLA, penomoran, form laporan, lampiran privat, Tiket Saya, detail, dashboard user | 1a | lihat PROJECT_STATUS |
+| 1a | Perbaikan BUG-01 audit log | 0 | ✅ |
+| 1b | Core ticketing: kategori/subkategori, SLA, penomoran, form laporan, lampiran privat, Tiket Saya, detail, dashboard user | 1a | ✅ |
 | 1c | Shared queue IT, balasan publik, internal note, quick reply, status + reopen/konfirmasi, assignment, history | 1b | ⏳ |
 | 1d | QR flow (`/qr/{token}`, preview/unduh PNG/PDF/cetak), notifikasi in-app | 1c | ⏳ |
 | 2 | Knowledge Base (artikel, kategori, tag, visibilitas, publish/archive, pencarian FULLTEXT/LIKE, artikel terkait) | 1b | ⏳ |

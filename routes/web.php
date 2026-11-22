@@ -1,14 +1,18 @@
 <?php
 
 use App\Http\Controllers\Admin\AuditLogController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\SlaPolicyController;
 use App\Http\Controllers\Admin\UnitController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\AttachmentController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\ProfileController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\It\DashboardController as ItDashboardController;
 use App\Http\Controllers\User\DashboardController as UserDashboardController;
+use App\Http\Controllers\User\TicketController as UserTicketController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -33,9 +37,18 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::get('/profil', [ProfileController::class, 'show'])->name('profile.show');
         Route::put('/profil', [ProfileController::class, 'update'])->name('profile.update');
 
+        // Lampiran: otorisasi di Policy (pemilik tiket / IT), bukan di route.
+        Route::get('/lampiran/{attachment}', [AttachmentController::class, 'show'])->name('attachments.show');
+
         // ROLE: USER
         Route::middleware('role:USER')->prefix('user')->name('user.')->group(function () {
             Route::get('/dashboard', UserDashboardController::class)->name('dashboard');
+
+            Route::get('/tiket', [UserTicketController::class, 'index'])->name('tickets.index');
+            Route::get('/tiket/riwayat', [UserTicketController::class, 'history'])->name('tickets.history');
+            Route::get('/tiket/buat', [UserTicketController::class, 'create'])->name('tickets.create');
+            Route::post('/tiket', [UserTicketController::class, 'store'])->middleware('throttle:tickets')->name('tickets.store');
+            Route::get('/tiket/{ticket}', [UserTicketController::class, 'show'])->name('tickets.show');
         });
 
         // ROLE: IT & IT ADMIN
@@ -49,6 +62,17 @@ Route::middleware(['auth', 'active'])->group(function () {
             Route::put('users/{user}/password', [UserController::class, 'resetPassword'])->name('users.password');
 
             Route::resource('units', UnitController::class)->except(['show', 'destroy']);
+
+            Route::get('categories', [CategoryController::class, 'index'])->name('categories.index');
+            Route::post('categories', [CategoryController::class, 'store'])->name('categories.store');
+            Route::put('categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
+            Route::delete('categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
+            Route::post('categories/{category}/subcategories', [CategoryController::class, 'storeSubcategory'])->name('categories.subcategories.store');
+            Route::put('subcategories/{subcategory}', [CategoryController::class, 'updateSubcategory'])->name('subcategories.update');
+            Route::delete('subcategories/{subcategory}', [CategoryController::class, 'destroySubcategory'])->name('subcategories.destroy');
+
+            Route::get('sla', [SlaPolicyController::class, 'index'])->name('sla.index');
+            Route::put('sla/{slaPolicy}', [SlaPolicyController::class, 'update'])->name('sla.update');
 
             Route::get('audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
         });

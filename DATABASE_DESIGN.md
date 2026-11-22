@@ -16,15 +16,15 @@
 | 2 | `units` | 15 unit bisnis + token QR | 1 |
 | 3 | `users` | Akun pengguna (tanpa registrasi publik) | 1 |
 | 4 | `user_units` | Relasi user ↔ unit (multi-unit, satu unit utama) | 1 |
-| 5 | `categories` | Kategori tiket | 2 |
-| 6 | `subcategories` | Subkategori tiket | 2 |
-| 7 | `ticket_sequences` | Penomoran tiket per unit per hari | 2 |
-| 8 | `tickets` | Tiket | 2 |
-| 9 | `ticket_replies` | Percakapan (PUBLIC / INTERNAL) | 2–3 |
-| 10 | `ticket_attachments` | Lampiran (private storage) | 2 |
-| 11 | `ticket_histories` | Riwayat aktivitas tiket | 2 |
+| 5 | `categories` | Kategori tiket | 2 ✅ |
+| 6 | `subcategories` | Subkategori tiket | 2 ✅ |
+| 7 | `ticket_sequences` | Penomoran tiket per unit per hari | 2 ✅ |
+| 8 | `tickets` | Tiket | 2 ✅ |
+| 9 | `ticket_replies` | Percakapan (PUBLIC / INTERNAL) | 3 (Phase 1c) |
+| 10 | `ticket_attachments` | Lampiran (private storage) | 2 ✅ (FK `ticket_reply_id` ditambahkan Phase 1c) |
+| 11 | `ticket_histories` | Riwayat aktivitas tiket | 2 ✅ |
 | 12 | `ticket_assignments` | Riwayat assignment PIC | 3 |
-| 13 | `sla_policies` | Target respons & penyelesaian per prioritas | 2 |
+| 13 | `sla_policies` | Target respons & penyelesaian per prioritas | 2 ✅ |
 | 14 | `notifications` | Laravel database notification | 4 |
 | 15 | `audit_logs` | Jejak audit | 1 |
 | + | `settings` | Konfigurasi aplikasi (key-value) | 1 |
@@ -203,6 +203,9 @@ Contoh: `app.timezone`, `ticket.auto_close_days`, `upload.max_kb`.
 ## 4. Penomoran Tiket
 
 Format: `IT-{UNIT_CODE}-{YYYYMMDD}-{SEQ}` — contoh `IT-DR-20261114-001`.
+
+Prefix `IT` berasal dari setting `ticket.number_prefix` (default `IT`, huruf kapital & angka, maks. 10) agar Edisi Produk dapat memakai prefix lain. Edisi Almega tetap `IT` — format tidak berubah.
+Implementasi: `App\Services\TicketNumberService` (menolak dipanggil di luar transaksi).
 
 Algoritma (`TicketNumberService`, di dalam `DB::transaction`):
 1. `INSERT IGNORE`-style upsert baris (`unit_id`, `ticket_date`) bila belum ada.

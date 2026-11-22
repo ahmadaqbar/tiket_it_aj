@@ -1,5 +1,8 @@
 # DEVELOPMENT PLAN — ALMEGA IT TICKETING SYSTEM
 
+> Sejak 2026-11-22 proyek dilanjutkan sebagai **AI IT Ticketing & Helpdesk Kit**. Urutan fase terbaru ada di
+> [PRODUCTIZATION_PLAN.md](PRODUCTIZATION_PLAN.md) §5; sprint 2–8 di bawah dipetakan ke Phase 1b–10 di sana.
+
 Organisasi: PT Almega Jaya Group · Production: https://it.almegajaya.com (shared hosting)
 Metode: incremental, satu sprint per commit, setiap sprint diuji sebelum dinyatakan selesai.
 
@@ -32,7 +35,7 @@ Metode: incremental, satu sprint per commit, setiap sprint diuji sebelum dinyata
 | Sprint | Lingkup | Status |
 |---|---|---|
 | **1 — Foundation** | Setup Laravel, konfigurasi DB, autentikasi (login username/email, logout, rate limit, ganti password, profil), role (USER/IT/IT_ADMIN) + middleware + Gate + Policy, master unit (15 unit via seeder), manajemen user (multi-unit), audit log (login/logout/user/unit), layout responsif per role, settings | ✅ Selesai — lihat `TESTING_REPORT.md` |
-| 2 — Core Ticketing | Kategori/subkategori (seeder + CRUD admin), SLA policy, penomoran tiket (transaction + row lock), form buat laporan (1 halaman), attachment private, Tiket Saya, detail tiket, dashboard user | ⏳ |
+| 2 — Core Ticketing | Kategori/subkategori (seeder + CRUD admin), SLA policy, penomoran tiket (transaction + row lock), form buat laporan (1 halaman), attachment private, Tiket Saya, detail tiket, dashboard user | ✅ Selesai 2026-11-22 (Phase 1b) |
 | 3 — IT Management | Shared queue + filter/sort/search/pagination, balasan publik, internal note, quick reply, status management + reopen/konfirmasi, assignment PIC, history | ⏳ |
 | 4 — QR & Notification | QR per unit (PNG/PDF/print/regenerate), `/qr/{token}` → login → unit terisi, database notification + polling, manifest PWA | ⏳ |
 | 5 — Analytics | Dashboard IT (summary + 9 chart), filter periode, SLA metrics, recurring issues | ⏳ |

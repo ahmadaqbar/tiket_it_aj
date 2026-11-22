@@ -8,6 +8,7 @@ use Illuminate\Database\Seeder;
 class SettingSeeder extends Seeder
 {
     public const DEFAULTS = [
+        ['ticket.number_prefix', 'IT', 'string', 'Prefix nomor tiket (format: PREFIX-UNIT-YYYYMMDD-NNN)'],
         ['ticket.auto_close_days', '3', 'int', 'Tiket Resolved otomatis Closed setelah (hari)'],
         ['upload.max_kb', '5120', 'int', 'Ukuran maksimum lampiran (KB)'],
         ['upload.max_files', '5', 'int', 'Jumlah maksimum lampiran per kiriman'],

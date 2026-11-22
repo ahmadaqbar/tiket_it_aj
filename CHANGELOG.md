@@ -4,6 +4,27 @@ Format mengikuti [Keep a Changelog](https://keepachangelog.com/id-ID/1.1.0/).
 
 ## [Unreleased]
 
+## [0.2.0] — 2026-11-22 — Phase 0, 1a, 1b (lanjutan menuju AI IT Ticketing & Helpdesk Kit)
+
+### Ditambahkan
+- Dokumen audit & productization: `PROJECT_AUDIT.md`, `PROJECT_STATUS.md`, `PRODUCTIZATION_PLAN.md`, `DEVELOPMENT_LOG.md`.
+- Core ticketing: migration `categories`, `subcategories`, `sla_policies`, `ticket_sequences`, `tickets`,
+  `ticket_attachments`, `ticket_histories` (aditif, tanpa mengubah tabel lama).
+- Seeder 8 kategori / 39 subkategori dan SLA default 4 prioritas; setting `ticket.number_prefix` (default `IT`).
+- Penomoran tiket `IT-{UNIT}-{YYYYMMDD}-{SEQ}` dengan transaksi + row lock.
+- Form Buat Laporan satu halaman (unit otomatis, subkategori dinamis, prioritas opsional, lampiran multi-file).
+- Lampiran privat (`storage/app/private`), validasi berdasarkan isi file, unduh lewat Policy.
+- Halaman Tiket Saya, Riwayat, Detail Tiket; dashboard user & IT memakai data nyata.
+- Category Management (CRUD, nonaktif, larangan hapus bila terpakai) dan SLA Settings.
+- `TicketPolicy`, `TicketAttachmentPolicy`, rate limit pembuatan tiket (10/menit/user).
+
+### Diperbaiki
+- BUG-01: audit log mencatat perubahan palsu `is_active 0 → false` dan `user.deactivated` palsu saat mengedit
+  user/unit nonaktif. `AuditService::logChanges()` kini memakai `Model::getChanges()`.
+
+### Keamanan
+- Disk `local` tidak lagi menyajikan file lewat route bawaan (`serve => false`); lampiran hanya lewat controller + Policy.
+
 ## [0.1.0] — 2026-11-14 — Sprint 1: Foundation
 
 ### Ditambahkan

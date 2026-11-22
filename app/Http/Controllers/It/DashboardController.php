@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\It;
 
 use App\Http\Controllers\Controller;
+use App\Models\Ticket;
 use App\Models\Unit;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -16,6 +17,7 @@ class DashboardController extends Controller
             'user' => $request->user(),
             'activeUnits' => Unit::active()->count(),
             'activeUsers' => User::active()->count(),
+            'statusCounts' => Ticket::query()->selectRaw('status, COUNT(*) as total')->groupBy('status')->pluck('total', 'status'),
         ]);
     }
 }

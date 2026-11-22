@@ -27,10 +27,10 @@ Cron (tiap menit) ── artisan schedule:run ── queue:work --stop-when-empt
 | Routing | `routes/web.php` | Grup per role: `user.*`, `it.*`, `admin.*` |
 | Middleware | `app/Http/Middleware` | `EnsureRole` (`role:`), `EnsureUserIsActive` (`active`), `EnsurePasswordChanged` (`password.changed`), `SecurityHeaders` |
 | Validasi | `app/Http/Requests` | Form Request untuk setiap input; pesan Bahasa Indonesia (`lang/id`) |
-| Otorisasi | `app/Policies`, Gate di `AppServiceProvider` | `UserPolicy`, `UnitPolicy`, `AuditLogPolicy`; Gate `access-it`, `access-admin` |
-| Business logic | `app/Services` | `UserService`, `UnitService`, `AuditService`, `SettingService` (+ Ticket*/Analytics/Report di sprint berikutnya) |
+| Otorisasi | `app/Policies`, Gate di `AppServiceProvider` | `UserPolicy`, `UnitPolicy`, `AuditLogPolicy`, `TicketPolicy`, `TicketAttachmentPolicy`; Gate `access-it`, `access-admin` |
+| Business logic | `app/Services` | `UserService`, `UnitService`, `AuditService`, `SettingService`, `TicketService`, `TicketNumberService`, `AttachmentService`, `CategoryService` (+ Analytics/Report/KB/AI di fase berikutnya) |
 | Model | `app/Models` | `Role`, `Unit`, `User`, `AuditLog` (append-only), `Setting` |
-| Enum | `app/Enums/RoleCode` | USER / IT / IT_ADMIN dengan level hirarki |
+| Enum | `app/Enums` | `RoleCode`, `TicketStatus`, `TicketPriority`, `TicketSource` (label, warna badge, bobot) |
 | Navigasi | `app/Support/Navigation` | Menu per role; item muncul otomatis saat route modul tersedia |
 | View | `resources/views` | `layouts/` (app, guest), `components/`, `auth/`, `user/`, `it/`, `admin/`, `errors/` |
 
@@ -59,6 +59,8 @@ Cron (tiap menit) ── artisan schedule:run ── queue:work --stop-when-empt
 | Controller + Form Request untuk CRUD admin; Livewire untuk bagian interaktif (sprint berikutnya) | CRUD tetap berfungsi tanpa JS dan mudah diuji; Livewire dipakai di form tiket, antrean, dan notifikasi |
 | Audit log append-only di level model | Mencegah perubahan/hapus walau ada bug di controller |
 | Sesi diputus dengan menghapus baris `sessions` | `Auth::logoutOtherDevices` membutuhkan middleware `AuthenticateSession`; penghapusan langsung lebih pasti pada driver database |
+| Form Buat Laporan = Blade + Alpine, bukan Livewire upload | Upload langsung multipart tanpa endpoint temporary Livewire; tetap berfungsi pada shared hosting dengan batas upload kecil |
+| Tiket di URL memakai ULID `public_id`; akses tidak sah → 404 | Tidak dapat ditebak dan tidak membocorkan keberadaan tiket |
 | Tidak memakai Laravel Breeze/Jetstream | Menghindari fitur registrasi publik / reset email yang tidak diminta |
 
 ## 6. Struktur Folder (Sprint 1)

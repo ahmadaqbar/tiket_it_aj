@@ -39,5 +39,7 @@ class AppServiceProvider extends ServiceProvider
 
         // Lapisan kedua rate limit login (per IP), selain limit per akun di LoginRequest.
         RateLimiter::for('login', fn (Request $request) => Limit::perMinute(20)->by($request->ip()));
+        // Anti-spam pembuatan tiket.
+        RateLimiter::for('tickets', fn (Request $request) => Limit::perMinute(10)->by($request->user()?->id ?: $request->ip()));
     }
 }

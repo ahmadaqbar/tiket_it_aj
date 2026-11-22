@@ -16,6 +16,8 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             UnitSeeder::class,
             SettingSeeder::class,
+            CategorySeeder::class,
+            SlaPolicySeeder::class,
             AdminUserSeeder::class,
         ]);
     }

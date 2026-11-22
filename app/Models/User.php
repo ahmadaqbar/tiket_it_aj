@@ -8,9 +8,11 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Collection;
 
 class User extends Authenticatable
 {
@@ -49,6 +51,17 @@ class User extends Authenticatable
             ->withTimestamps()
             ->orderByDesc('user_units.is_primary')
             ->orderBy('units.sort_order');
+    }
+
+    public function tickets(): HasMany
+    {
+        return $this->hasMany(Ticket::class);
+    }
+
+    /** Unit aktif yang boleh dilaporkan user (urutan: unit utama dulu). */
+    public function activeUnits(): Collection
+    {
+        return $this->units->where('is_active', true)->values();
     }
 
     public function roleCode(): RoleCode
