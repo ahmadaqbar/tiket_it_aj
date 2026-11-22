@@ -16,3 +16,6 @@ Schedule::command('queue:work --stop-when-empty --max-time=50 --tries=3')
     ->withoutOverlapping(5);
 
 Schedule::command('queue:prune-failed --hours=720')->daily();
+
+// Tiket Resolved tanpa konfirmasi pelapor ditutup otomatis (ticket.auto_close_days).
+Schedule::command('tickets:auto-close')->hourly()->withoutOverlapping(10);

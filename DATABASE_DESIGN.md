@@ -20,15 +20,15 @@
 | 6 | `subcategories` | Subkategori tiket | 2 ✅ |
 | 7 | `ticket_sequences` | Penomoran tiket per unit per hari | 2 ✅ |
 | 8 | `tickets` | Tiket | 2 ✅ |
-| 9 | `ticket_replies` | Percakapan (PUBLIC / INTERNAL) | 3 (Phase 1c) |
-| 10 | `ticket_attachments` | Lampiran (private storage) | 2 ✅ (FK `ticket_reply_id` ditambahkan Phase 1c) |
+| 9 | `ticket_replies` | Percakapan (PUBLIC / INTERNAL) | 3 ✅ (Phase 1c) |
+| 10 | `ticket_attachments` | Lampiran (private storage) | 2 ✅ (FK `ticket_reply_id` ✅ Phase 1c) |
 | 11 | `ticket_histories` | Riwayat aktivitas tiket | 2 ✅ |
-| 12 | `ticket_assignments` | Riwayat assignment PIC | 3 |
+| 12 | `ticket_assignments` | Riwayat assignment PIC | 3 ✅ |
 | 13 | `sla_policies` | Target respons & penyelesaian per prioritas | 2 ✅ |
 | 14 | `notifications` | Laravel database notification | 4 |
 | 15 | `audit_logs` | Jejak audit | 1 |
 | + | `settings` | Konfigurasi aplikasi (key-value) | 1 |
-| + | `quick_reply_templates` | Template balasan cepat IT | 3 |
+| + | `quick_reply_templates` | Template balasan cepat IT (6 template awal) | 3 ✅ |
 | + | `sessions`, `cache`, `cache_locks`, `jobs`, `job_batches`, `failed_jobs` | Infrastruktur Laravel (driver database, tanpa Redis) | 1 |
 
 ## 2. Diagram Relasi (ringkas)
@@ -229,7 +229,11 @@ NEW ──► IN_PROGRESS ◄──► PENDING
                  CLOSED ┘ (CLOSED final)
 ```
 - Perubahan status hanya oleh IT/IT_ADMIN, kecuali: USER pemilik tiket dapat **konfirmasi** (RESOLVED→CLOSED) dan **reopen** (RESOLVED→IN_PROGRESS).
-- Tiket RESOLVED otomatis CLOSED setelah `ticket.auto_close_days` hari tanpa respons user (scheduler).
+- Tiket RESOLVED otomatis CLOSED setelah `ticket.auto_close_days` hari tanpa respons user (scheduler `tickets:auto-close`, tiap jam; 0 = nonaktif).
+- RESOLVED wajib disertai catatan penyelesaian (dikirim sebagai balasan publik).
+- Timestamp: `resolved_at` diisi saat RESOLVED (dan saat CLOSED bila kosong), dikosongkan saat dibuka kembali; `closed_at` saat CLOSED;
+  `first_response_at` = balasan publik IT pertama atau perubahan status pertama oleh IT.
+- Implementasi: `App\Services\TicketStatusService` (transisi divalidasi di server, row lock per tiket).
 - Setiap perubahan tercatat di `ticket_histories`.
 
 ## 6. Definisi Metrik Analytics

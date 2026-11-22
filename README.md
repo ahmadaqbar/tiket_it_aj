@@ -3,7 +3,7 @@
 Sistem IT Helpdesk & Ticket Management terpusat untuk **PT Almega Jaya Group** (15 unit operasional).
 Production: **https://it.almegajaya.com** (shared hosting).
 
-> **Status:** Foundation + Core Ticketing (pembuatan laporan) selesai. Antrean IT, balasan, dan status menyusul (Phase 1c).
+> **Status:** Foundation + siklus tiket inti selesai (lapor, antrean IT, balasan, catatan internal, status, PIC). QR flow & notifikasi menyusul (Phase 1d).
 > Proyek sedang dikembangkan menjadi **AI IT Ticketing & Helpdesk Kit** — lihat [PROJECT_STATUS.md](PROJECT_STATUS.md),
 > [PROJECT_AUDIT.md](PROJECT_AUDIT.md), dan [PRODUCTIZATION_PLAN.md](PRODUCTIZATION_PLAN.md).
 
@@ -26,7 +26,11 @@ dompdf · openspout · chillerlan/php-qrcode. Tanpa Redis, Supervisor, Docker, a
 **Core Ticketing (Phase 1b):** form Buat Laporan satu halaman, nomor tiket otomatis `IT-{UNIT}-{YYYYMMDD}-{SEQ}`,
 lampiran privat, Tiket Saya/Riwayat/Detail, dashboard dengan data nyata, Category Management, SLA Settings.
 
-Belum tersedia: antrean & respons IT, status, QR flow, notifikasi, analytics, laporan, Knowledge Base, AI.
+**IT Management (Phase 1c):** shared queue seluruh unit (filter unit/kategori/subkategori/status/prioritas/tanggal/PIC/pelapor,
+pencarian, urutan, paginasi, export Excel), balasan publik & catatan internal dengan lampiran, quick reply, perubahan status
+(+ catatan penyelesaian wajib), konfirmasi/buka kembali oleh pelapor, auto-close, assignment PIC, klasifikasi ulang + SLA.
+
+Belum tersedia: QR flow, notifikasi, analytics, laporan PDF/Excel, Knowledge Base, AI.
 
 ## Setup Development (Windows — Laragon/XAMPP)
 

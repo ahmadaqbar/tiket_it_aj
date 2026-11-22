@@ -84,3 +84,24 @@
 | Dashboard user & Tiket Saya dengan data nyata | ✅ |
 | IT Admin: dashboard IT (hitungan per status), Category Management, SLA Settings | ✅ |
 | Error JavaScript | Tidak ada |
+
+## Phase 1c — IT Management (2026-11-22)
+
+**Hasil: 155 test · 534 assertion · 0 gagal** (sebelumnya 120; 35 test baru).
+
+| Suite | Jumlah | Hal yang diverifikasi |
+|---|---|---|
+| Feature/Ticket/InternalNotePrivacyTest | 10 | IT membuat balasan publik & catatan internal (history + audit); **pelapor tidak melihat isi, entri riwayat, maupun label catatan internal**; IT/IT Admin melihatnya; **pelapor tidak dapat membuat catatan internal walau memalsukan request**; lampiran catatan internal bertanda INTERNAL dan 404 bagi pelapor; balasan pelapor + lampiran; user lain 403; `first_response_at` hanya dari balasan publik IT; tiket Closed hanya menerima catatan internal |
+| Feature/Ticket/TicketStatusTest | 11 | Ubah status + history + audit + first response; RESOLVED wajib catatan (menjadi balasan publik); CLOSED dengan pesan; transisi tidak valid ditolak (CLOSED final); user tidak dapat mengubah status; konfirmasi pelapor; reopen dengan alasan (resolved_at dikosongkan, reopened_count); user lain tidak dapat konfirmasi/reopen; IT reopen; auto-close hanya tiket Resolved lewat batas; auto-close dapat dinonaktifkan |
+| Feature/Ticket/ItQueueTest | 12 | Hanya IT/IT Admin; semua unit dalam satu antrean; 11 kombinasi filter; filter tanggal & melewati SLA + validasi rentang; urutan prioritas; paginasi 20; ambil/assign/lepas PIC + riwayat assignment; PIC harus staf IT; klasifikasi ulang menghitung ulang SLA + history; subkategori tidak cocok ditolak; urutan riwayat lengkap; dashboard IT |
+| Feature/Ticket/TicketExportTest | 2 | XLSX dibaca ulang dengan openspout: header, filter unit diterapkan, **tidak memuat catatan internal**, audit `ticket.exported`; user 403 |
+
+### Temuan selama pengujian
+- Import `TicketStatus` di `It/DashboardController` terhapus oleh Pint di fase sebelumnya (belum dipakai saat itu) → error 500 di dashboard IT; tertangkap oleh `RoleAccessTest`, diperbaiki.
+- Label "Catatan Internal" ikut ter-render (dalam ekspresi Alpine) pada form balasan pelapor — bukan kebocoran isi, tetapi diubah agar string internal hanya dirender untuk IT.
+- Form balasan IT pada tiket Closed semula default "publik" (akan 403) → kini khusus catatan internal.
+- Urutan di `TicketStatusService::change`: pesan penutupan harus dikirim **sebelum** status CLOSED diterapkan.
+
+### Pengujian Browser (Playwright, end-to-end)
+IT (desktop 1440px) ambil tiket dari antrean → catatan internal → quick reply (template masuk ke textarea, dapat diedit) → Dalam Proses → Resolved dengan catatan → export XLSX terunduh.
+User (iPhone 13) membuka tiket: balasan & catatan penyelesaian terlihat, **teks catatan internal tidak ada di HTML**, konfirmasi "Ya, sudah selesai" → Closed. Tidak ada error JavaScript.

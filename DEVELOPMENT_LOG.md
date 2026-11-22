@@ -34,3 +34,16 @@ Catatan kronologis keputusan dan pekerjaan. Entri terbaru di bawah.
 - Temuan saat test: `UploadedFile::fake()` tidak mendeteksi MIME dari isi → test keamanan memakai file nyata.
 - Temuan UI: ukuran lampiran < 1 KB tampil "0 KB" → dibulatkan ke atas.
 - Hasil: 120/120 test lulus; smoke test Playwright (mobile user & desktop admin) tanpa error JS.
+
+## 2026-11-22 — Phase 1c: IT Management
+- Migration aditif (ticket_replies, ticket_assignments, quick_reply_templates, FK reply pada lampiran) dijalankan inkremental di DB dev → sukses.
+- Keputusan:
+  - Satu pintu visibilitas: `TicketReply::visibleTo()` & `TicketHistory::visibleTo()`; controller pelapor tidak pernah memuat data internal.
+  - Role USER yang mengirim `visibility=INTERNAL` diperlakukan sebagai PUBLIC (tidak ada data internal tercipta).
+  - RESOLVED wajib catatan penyelesaian (bahan ringkasan AI & laporan kelak). Pesan status dikirim sebagai balasan publik.
+  - CLOSED final; IT tetap dapat menambah catatan internal pada tiket Closed untuk dokumentasi.
+  - Reopen mengosongkan `resolved_at` agar analytics tidak menghitung tiket yang belum selesai.
+  - Perubahan prioritas menghitung ulang SLA dari `created_at`.
+  - Export antrean memakai openspout ke file temp lalu dihapus setelah dikirim (hemat memori, cocok shared hosting).
+  - Kelola template quick reply via UI ditunda ke Phase 6 (System Settings) agar tidak menambah menu baru.
+- Hasil: 155/155 test; smoke test end-to-end IT ↔ user tanpa error JS.

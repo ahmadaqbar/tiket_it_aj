@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             SettingSeeder::class,
             CategorySeeder::class,
             SlaPolicySeeder::class,
+            QuickReplyTemplateSeeder::class,
             AdminUserSeeder::class,
         ]);
     }

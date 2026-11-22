@@ -107,7 +107,8 @@ Scheduler menjalankan (lihat `routes/console.php`):
 |---|---|---|
 | tiap menit | `queue:work --stop-when-empty --max-time=50` | Memproses antrean database lalu berhenti (tanpa worker permanen) |
 | harian | `queue:prune-failed --hours=720` | Membersihkan job gagal > 30 hari |
-| (Sprint 3–4) | auto-close tiket Resolved, notifikasi | ditambahkan saat modul tersedia |
+| tiap jam | `tickets:auto-close` | Menutup tiket Resolved yang tidak dikonfirmasi dalam `ticket.auto_close_days` hari |
+| (Phase 1d) | notifikasi | ditambahkan saat modul tersedia |
 
 **Jika Cron tidak tersedia:** fitur inti (login, tiket, balasan, notifikasi in-app) tetap berjalan karena tidak bergantung pada antrean.
 Tugas terjadwal (auto-close tiket) akan disediakan sebagai tombol **"Jalankan Tugas Terjadwal"** di halaman IT Admin (Sprint 4) — dijalankan manual oleh admin, tidak dipicu oleh request user biasa.

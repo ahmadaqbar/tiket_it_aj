@@ -21,7 +21,9 @@ Status kontrol keamanan per item persyaratan. ✅ = terimplementasi & diuji · �
 
 - **Privasi tiket**: URL memakai ULID `public_id`; tiket milik orang lain menghasilkan **404**; semua daftar di-scope `user_id`.
 - **Isolasi unit**: user hanya dapat melapor untuk unit aktif yang ditetapkan kepadanya (divalidasi di server).
-- **Anti-spam**: maksimal 10 tiket/menit per user.
+- **Anti-spam**: maksimal 10 tiket/menit per user (juga berlaku untuk balasan); export maks. 6/menit.
+- **Privasi catatan internal**: balasan, lampiran, dan entri riwayat INTERNAL tidak pernah dimuat untuk role USER (`visibleTo()`), USER tidak dapat membuat catatan internal (dipaksa PUBLIC di server), export tidak memuat percakapan.
+- **Status**: transisi divalidasi di server (`TicketStatusService`) dengan row lock; USER hanya dapat konfirmasi/buka kembali tiket miliknya yang Resolved.
 
 - **Tanpa registrasi publik** — akun hanya dibuat IT Admin. Tidak ada endpoint reset via email.
 - **Password sementara** wajib diganti saat login pertama (`EnsurePasswordChanged`).

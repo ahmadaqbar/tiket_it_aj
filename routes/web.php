@@ -11,6 +11,8 @@ use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\ProfileController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\It\DashboardController as ItDashboardController;
+use App\Http\Controllers\It\TicketController as ItTicketController;
+use App\Http\Controllers\TicketActionController;
 use App\Http\Controllers\User\DashboardController as UserDashboardController;
 use App\Http\Controllers\User\TicketController as UserTicketController;
 use Illuminate\Support\Facades\Route;
@@ -40,6 +42,9 @@ Route::middleware(['auth', 'active'])->group(function () {
         // Lampiran: otorisasi di Policy (pemilik tiket / IT), bukan di route.
         Route::get('/lampiran/{attachment}', [AttachmentController::class, 'show'])->name('attachments.show');
 
+        // Balasan tiket (pelapor & IT). Visibilitas & hak akses diperiksa di ReplyRequest + service.
+        Route::post('/tiket/{ticket}/balasan', [TicketActionController::class, 'reply'])->middleware('throttle:tickets')->name('tickets.reply');
+
         // ROLE: USER
         Route::middleware('role:USER')->prefix('user')->name('user.')->group(function () {
             Route::get('/dashboard', UserDashboardController::class)->name('dashboard');
@@ -49,11 +54,21 @@ Route::middleware(['auth', 'active'])->group(function () {
             Route::get('/tiket/buat', [UserTicketController::class, 'create'])->name('tickets.create');
             Route::post('/tiket', [UserTicketController::class, 'store'])->middleware('throttle:tickets')->name('tickets.store');
             Route::get('/tiket/{ticket}', [UserTicketController::class, 'show'])->name('tickets.show');
+            Route::post('/tiket/{ticket}/konfirmasi', [TicketActionController::class, 'confirm'])->name('tickets.confirm');
+            Route::post('/tiket/{ticket}/buka-kembali', [TicketActionController::class, 'reopen'])->name('tickets.reopen');
         });
 
         // ROLE: IT & IT ADMIN
         Route::middleware('role:IT,IT_ADMIN')->prefix('it')->name('it.')->group(function () {
             Route::get('/dashboard', ItDashboardController::class)->name('dashboard');
+
+            Route::get('/tiket', [ItTicketController::class, 'index'])->name('tickets.index');
+            Route::get('/tiket/export', [ItTicketController::class, 'export'])->middleware('throttle:6,1')->name('tickets.export');
+            Route::get('/tiket/{ticket}', [ItTicketController::class, 'show'])->name('tickets.show');
+            Route::put('/tiket/{ticket}/status', [TicketActionController::class, 'status'])->name('tickets.status');
+            Route::put('/tiket/{ticket}/pic', [TicketActionController::class, 'assign'])->name('tickets.assign');
+            Route::post('/tiket/{ticket}/ambil', [TicketActionController::class, 'take'])->name('tickets.take');
+            Route::put('/tiket/{ticket}/klasifikasi', [TicketActionController::class, 'reclassify'])->name('tickets.reclassify');
         });
 
         // ROLE: IT ADMIN

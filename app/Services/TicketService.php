@@ -84,6 +84,47 @@ class TicketService
         return $ticket;
     }
 
+    /**
+     * Perubahan klasifikasi oleh IT (prioritas / kategori / subkategori).
+     * Perubahan prioritas menghitung ulang SLA dari waktu tiket dibuat.
+     */
+    public function reclassify(Ticket $ticket, User $actor, TicketPriority $priority, int $categoryId, ?int $subcategoryId): Ticket
+    {
+        return DB::transaction(function () use ($ticket, $actor, $priority, $categoryId, $subcategoryId) {
+            $ticket->loadMissing(['category:id,name', 'subcategory:id,name']);
+            $oldPriority = $ticket->priority;
+            $oldCategory = trim($ticket->category->name.($ticket->subcategory ? ' / '.$ticket->subcategory->name : ''));
+
+            if ($priority !== $oldPriority) {
+                $sla = SlaPolicy::activeFor($priority);
+                $ticket->fill([
+                    'priority' => $priority,
+                    'sla_policy_id' => $sla?->id,
+                    'response_due_at' => $sla ? $ticket->created_at->copy()->addMinutes($sla->response_minutes) : null,
+                    'resolution_due_at' => $sla ? $ticket->created_at->copy()->addMinutes($sla->resolution_minutes) : null,
+                ]);
+                $this->history($ticket, $actor, TicketHistory::PRIORITY_CHANGED, $oldPriority->value, $priority->value);
+            }
+
+            $categoryChanged = $ticket->category_id !== $categoryId || $ticket->subcategory_id !== $subcategoryId;
+            $ticket->fill(['category_id' => $categoryId, 'subcategory_id' => $subcategoryId])->save();
+
+            if ($categoryChanged) {
+                $ticket->load(['category:id,name', 'subcategory:id,name']);
+                $newCategory = trim($ticket->category->name.($ticket->subcategory ? ' / '.$ticket->subcategory->name : ''));
+                $this->history($ticket, $actor, TicketHistory::CATEGORY_CHANGED, $oldCategory, $newCategory);
+            }
+
+            if ($priority !== $oldPriority || $categoryChanged) {
+                $this->audit->log('ticket.reclassified', $ticket, "{$ticket->ticket_number}: klasifikasi diubah",
+                    ['priority' => $oldPriority->value, 'category' => $oldCategory],
+                    ['priority' => $priority->value, 'category' => $newCategory ?? $oldCategory]);
+            }
+
+            return $ticket;
+        });
+    }
+
     public function history(Ticket $ticket, ?User $actor, string $action, ?string $old = null, ?string $new = null, ?string $note = null): TicketHistory
     {
         return TicketHistory::create([

@@ -10,6 +10,7 @@ use App\Models\Unit;
 use App\Models\User;
 use App\Services\TicketService;
 use Database\Seeders\CategorySeeder;
+use Database\Seeders\QuickReplyTemplateSeeder;
 use Database\Seeders\RoleSeeder;
 use Database\Seeders\SettingSeeder;
 use Database\Seeders\SlaPolicySeeder;
@@ -26,7 +27,7 @@ abstract class TestCase extends BaseTestCase
         parent::setUp();
 
         $this->withoutVite();
-        $this->seed([RoleSeeder::class, UnitSeeder::class, SettingSeeder::class, CategorySeeder::class, SlaPolicySeeder::class]);
+        $this->seed([RoleSeeder::class, UnitSeeder::class, SettingSeeder::class, CategorySeeder::class, SlaPolicySeeder::class, QuickReplyTemplateSeeder::class]);
     }
 
     protected function unit(string $code = 'HO'): Unit

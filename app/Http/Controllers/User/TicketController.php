@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTicketRequest;
 use App\Models\Category;
 use App\Models\Ticket;
+use App\Models\TicketAttachment;
 use App\Services\AttachmentService;
 use App\Services\TicketService;
 use Illuminate\Http\RedirectResponse;
@@ -77,13 +78,19 @@ class TicketController extends Controller
         // 404 (bukan 403) agar keberadaan tiket milik orang lain tidak terungkap.
         abort_unless($request->user()->can('view', $ticket), 404);
 
+        $user = $request->user();
+        // Catatan internal, lampiran internal, dan riwayat internal TIDAK PERNAH dimuat untuk pelapor.
         $ticket->load([
             'unit', 'category', 'subcategory', 'assignee:id,name',
-            'attachments' => fn ($q) => $q->where('visibility', 'PUBLIC')->orderBy('id'),
+            'attachments' => fn ($q) => $q->whereNull('ticket_reply_id')->where('visibility', TicketAttachment::VISIBILITY_PUBLIC)->orderBy('id'),
+            'replies' => fn ($q) => $q->visibleTo($user),
+            'replies.author:id,name,role_id',
+            'replies.attachments' => fn ($q) => $q->where('visibility', TicketAttachment::VISIBILITY_PUBLIC),
+            'histories' => fn ($q) => $q->visibleTo($user),
             'histories.user:id,name',
         ]);
 
-        return view('user.tickets.show', ['ticket' => $ticket]);
+        return view('user.tickets.show', ['ticket' => $ticket, 'maxKb' => app(AttachmentService::class)->maxKilobytes(), 'maxFiles' => app(AttachmentService::class)->maxFiles()]);
     }
 
     private function listing(Request $request, bool $history): View

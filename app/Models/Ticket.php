@@ -88,6 +88,26 @@ class Ticket extends Model
         return $this->hasMany(TicketAttachment::class);
     }
 
+    public function replies(): HasMany
+    {
+        return $this->hasMany(TicketReply::class)->orderBy('created_at')->orderBy('id');
+    }
+
+    public function assignments(): HasMany
+    {
+        return $this->hasMany(TicketAssignment::class)->orderBy('created_at')->orderBy('id');
+    }
+
+    public function isClosed(): bool
+    {
+        return $this->status === TicketStatus::CLOSED;
+    }
+
+    public function isOverdue(): bool
+    {
+        return $this->status->isOpen() && $this->resolution_due_at !== null && $this->resolution_due_at->isPast();
+    }
+
     public function histories(): HasMany
     {
         return $this->hasMany(TicketHistory::class)->orderBy('created_at')->orderBy('id');

@@ -52,7 +52,14 @@ Tekan **Keluar** di menu (☰ pada HP).
 | Resolved | IT menyatakan sudah selesai |
 | Closed | Tiket ditutup |
 
-## 8. ⏳ Fitur Berikutnya
-- Membalas respons IT, konfirmasi selesai / buka kembali
+## 8. Membalas & Menyelesaikan Tiket
+- Di halaman tiket, bagian **Percakapan** menampilkan balasan dari Tim IT. Tulis pesan (bisa dengan foto/dokumen) lalu **Kirim Balasan**.
+- Saat tiket berstatus **Resolved**, muncul pertanyaan *"Apakah kendala sudah benar-benar selesai?"*:
+  - **Ya, sudah selesai** → tiket ditutup (Closed).
+  - **Belum, buka kembali** → tulis apa yang masih bermasalah; tiket kembali ke Tim IT.
+- Bila tidak dikonfirmasi dalam beberapa hari (default 3), tiket ditutup otomatis.
+- Tiket Closed tidak dapat dibalas. Buat laporan baru bila kendala muncul lagi.
+
+## 9. ⏳ Fitur Berikutnya
 - Scan QR Code unit untuk membuat laporan lebih cepat
 - Notifikasi dalam aplikasi

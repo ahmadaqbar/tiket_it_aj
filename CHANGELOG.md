@@ -4,6 +4,18 @@ Format mengikuti [Keep a Changelog](https://keepachangelog.com/id-ID/1.1.0/).
 
 ## [Unreleased]
 
+## [0.3.0] — 2026-11-22 — Phase 1c: IT Management
+
+### Ditambahkan
+- Migration aditif `ticket_replies`, `ticket_assignments`, `quick_reply_templates`, FK `ticket_attachments.ticket_reply_id`.
+- Shared queue IT `/it/tiket`: filter unit, kategori, subkategori, status, prioritas, tanggal, PIC (termasuk "belum ada PIC"/"tiket saya"),
+  nama pelapor, nomor/judul, "melewati SLA"; urutan; paginasi; tombol **Ambil**; export XLSX (openspout, tanpa catatan internal).
+- Detail tiket IT: percakapan + catatan internal (ditandai jelas), quick reply yang dapat diedit, ubah status, PIC, klasifikasi, info SLA & durasi.
+- Balasan pelapor dengan lampiran; konfirmasi selesai & buka kembali (dengan alasan) pada tiket Resolved.
+- `TicketStatusService` (transisi tervalidasi, RESOLVED wajib catatan), `TicketReplyService`, `TicketAssignmentService`, `TicketService::reclassify`.
+- Command `tickets:auto-close` (scheduler tiap jam) memakai setting `ticket.auto_close_days`.
+- Dashboard IT: kartu status tertaut ke antrean, tiket saya, melewati SLA, tiket baru tanpa PIC.
+
 ## [0.2.0] — 2026-11-22 — Phase 0, 1a, 1b (lanjutan menuju AI IT Ticketing & Helpdesk Kit)
 
 ### Ditambahkan

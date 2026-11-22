@@ -40,13 +40,7 @@ class StoreTicketRequest extends FormRequest
                 ->where('category_id', (int) $this->input('category_id'))],
             'description' => ['required', 'string', 'min:10', 'max:5000'],
             'priority' => ['nullable', Rule::enum(TicketPriority::class)],
-            'attachments' => ['nullable', 'array', 'max:'.$attachments->maxFiles()],
-            'attachments.*' => [
-                'file',
-                'max:'.$attachments->maxKilobytes(),
-                'mimes:'.AttachmentService::ALLOWED_EXTENSIONS,
-                'mimetypes:'.implode(',', array_keys(AttachmentService::ALLOWED)),
-            ],
+            ...$attachments->rules(),
         ];
     }
 
@@ -64,8 +58,7 @@ class StoreTicketRequest extends FormRequest
         return [
             'unit_id.in' => 'Unit tidak valid atau Anda tidak terdaftar di unit tersebut.',
             'subcategory_id.exists' => 'Subkategori tidak sesuai dengan kategori yang dipilih.',
-            'attachments.*.mimes' => 'Lampiran harus berupa foto (JPG/PNG/WEBP), PDF, Word, Excel, atau TXT.',
-            'attachments.*.mimetypes' => 'Isi file lampiran tidak sesuai dengan jenis file yang diizinkan.',
+            ...AttachmentService::messages(),
         ];
     }
 }

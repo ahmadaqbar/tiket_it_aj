@@ -1,6 +1,6 @@
 # PROJECT STATUS
 
-Terakhir diperbarui: 2026-11-22 (setelah Phase 1b). Legenda: ✅ selesai & teruji · 🟡 sebagian · ⏳ belum · ❌ rusak.
+Terakhir diperbarui: 2026-11-22 (setelah Phase 1c). Legenda: ✅ selesai & teruji · 🟡 sebagian · ⏳ belum · ❌ rusak.
 
 | Modul | Status | Catatan |
 |---|---|---|
@@ -12,8 +12,12 @@ Terakhir diperbarui: 2026-11-22 (setelah Phase 1b). Legenda: ✅ selesai & teruj
 | SLA Policy | ✅ | Due date respons/penyelesaian dihitung saat tiket dibuat |
 | Ticket Creation & Numbering | ✅ | Format `IT-{UNIT}-{YYYYMMDD}-{SEQ}` tetap; prefix dapat dikonfigurasi |
 | Attachment (private) | ✅ | Validasi isi file, unduh via Policy |
-| Tiket Saya / Detail / Dashboard user | ✅ | Balasan IT belum ada (Phase 1c) |
-| Shared Queue IT, Reply, Internal Note, Status, Assignment | ⏳ | Phase 1c |
+| Tiket Saya / Detail / Dashboard user | ✅ | Termasuk balasan, konfirmasi selesai, buka kembali |
+| Shared Queue IT (filter, cari, urut, paginasi, export XLSX) | ✅ | |
+| Balasan Publik & Catatan Internal (+ lampiran) | ✅ | Privasi internal diuji |
+| Quick Reply (6 template) | ✅ | Halaman kelola template ⏳ Phase 6 |
+| Status, konfirmasi/reopen, auto-close | ✅ | Auto-close butuh Cron |
+| Assignment PIC & Klasifikasi ulang | ✅ | |
 | QR Code flow & UI | 🟡 | Token ada; route/UI Phase 1d |
 | Notification | ⏳ | Phase 1d |
 | Knowledge Base | ⏳ | Phase 2 |
@@ -22,7 +26,7 @@ Terakhir diperbarui: 2026-11-22 (setelah Phase 1b). Legenda: ✅ selesai & teruj
 | Analytics & Recurring Issues | ⏳ | Phase 7 |
 | Reporting PDF/Excel | ⏳ | Phase 7 |
 
-Test terakhir: **120 test lulus** (2026-11-22).
+Test terakhir: **155 test lulus** (2026-11-22).
 
-**Belum dapat digunakan operasional penuh:** IT belum memiliki antrean tiket, belum bisa membalas atau mengubah status
-(Phase 1c). Tiket sudah dapat dibuat user dan terlihat jumlahnya di dashboard IT.
+**Siklus tiket inti sudah lengkap** (lapor → antrean IT → balas/catatan internal → status → konfirmasi/tutup).
+Belum ada: QR flow & notifikasi (Phase 1d), sehingga user/IT belum mendapat pemberitahuan otomatis.

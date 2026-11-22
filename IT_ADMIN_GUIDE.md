@@ -7,7 +7,7 @@
 | Role | Kemampuan (saat ini) |
 |---|---|
 | **User** | Dashboard user, profil, ganti password |
-| **IT** | Dashboard IT (⏳ antrean tiket, balasan, analytics, laporan) |
+| **IT** | Dashboard IT, antrean tiket semua unit, balasan & catatan internal, status, PIC, klasifikasi, export Excel (⏳ analytics, laporan) |
 | **IT Admin** | Semua kemampuan IT + User Management, Unit Management, Audit Log (⏳ kategori, SLA, QR, pengaturan) |
 
 Hak akses diperiksa di server. Membuka URL admin dengan akun non-admin menghasilkan **403 Akses Ditolak**.
@@ -27,6 +27,17 @@ Saat login pertama wajib ganti password. Setelah itu, kosongkan `INITIAL_ADMIN_P
   User **tidak dihapus** agar riwayat tiket tetap utuh.
 - **Reset Password** (panel kanan halaman ubah): sesi aktif user diputus, user wajib ganti password lagi.
 - Pengaman: Anda tidak dapat menonaktifkan/menurunkan role akun sendiri, dan IT Admin aktif terakhir tidak dapat dinonaktifkan.
+
+## 3b. Menangani Tiket (IT & IT Admin)
+- **Semua Tiket** = shared queue seluruh unit. Menu Tiket Baru/Dalam Proses/Pending/Resolved/Closed adalah filter status.
+- **Filter**: unit, kategori, subkategori, prioritas, PIC (termasuk *Belum ada PIC* / *Tiket saya*), nama pelapor, tanggal, *Melewati SLA*. Urutkan berdasarkan terbaru, terlama, prioritas, aktivitas, atau batas SLA.
+- **Ambil**: menjadikan Anda PIC tiket tanpa PIC. PIC bersifat opsional.
+- **Balasan Publik** terlihat pelapor; **Catatan Internal** (kotak kuning) hanya IT & IT Admin — gunakan untuk informasi sensitif (password, konfigurasi).
+- **Template balasan cepat**: pilih template, teks masuk ke kolom pesan dan dapat diedit sebelum dikirim.
+- **Ubah Status**: hanya transisi yang valid yang ditampilkan. **Resolved wajib catatan penyelesaian** (dikirim ke pelapor). Closed bersifat final.
+- **Klasifikasi**: ubah prioritas/kategori; perubahan prioritas menghitung ulang target SLA.
+- **Export Excel**: mengunduh daftar sesuai filter aktif (maks. 10.000 baris, tanpa catatan internal).
+- Tiket Resolved yang tidak dikonfirmasi pelapor ditutup otomatis setelah `ticket.auto_close_days` hari (butuh Cron).
 
 ## 4. Unit Management (`Administrasi → Unit Management`)
 - 15 unit awal dibuat oleh seeder (HO, MK, GK, KMC, K57, DR, TS, SCN, O2D, MMJ, PMC, POV, OMA, SH, STZ).
@@ -53,7 +64,9 @@ Aksi yang dicatat saat ini:
 `auth.login`, `auth.logout`, `auth.login_failed`, `auth.login_blocked`, `auth.password_changed`,
 `user.created`, `user.updated`, `user.units_changed`, `user.activated`, `user.deactivated`, `user.password_reset`,
 `user.profile_updated`, `unit.created`, `unit.updated`, `unit.qr_regenerated`, `ticket.created`,
-`category.created|updated|deleted`, `subcategory.created|updated|deleted`, `sla.updated`.
+`category.created|updated|deleted`, `subcategory.created|updated|deleted`, `sla.updated`,
+`ticket.replied`, `ticket.internal_note`, `ticket.status_changed`, `ticket.confirmed`, `ticket.reopened`, `ticket.auto_closed`,
+`ticket.assigned`, `ticket.reclassified`, `ticket.exported`.
 
 Password, token QR, dan remember token **tidak pernah** disimpan di audit log.
 

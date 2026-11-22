@@ -47,6 +47,28 @@ class AttachmentService
         return max(1, (int) $this->settings->get('upload.max_files', 5));
     }
 
+    /** Aturan validasi lampiran yang sama untuk semua form (deteksi berdasarkan isi file). */
+    public function rules(string $field = 'attachments'): array
+    {
+        return [
+            $field => ['nullable', 'array', 'max:'.$this->maxFiles()],
+            $field.'.*' => [
+                'file',
+                'max:'.$this->maxKilobytes(),
+                'mimes:'.self::ALLOWED_EXTENSIONS,
+                'mimetypes:'.implode(',', array_keys(self::ALLOWED)),
+            ],
+        ];
+    }
+
+    public static function messages(string $field = 'attachments'): array
+    {
+        return [
+            $field.'.*.mimes' => 'Lampiran harus berupa foto (JPG/PNG/WEBP), PDF, Word, Excel, atau TXT.',
+            $field.'.*.mimetypes' => 'Isi file lampiran tidak sesuai dengan jenis file yang diizinkan.',
+        ];
+    }
+
     public function store(Ticket $ticket, UploadedFile $file, User $uploader, string $visibility = TicketAttachment::VISIBILITY_PUBLIC, ?int $replyId = null): TicketAttachment
     {
         $mime = (string) $file->getMimeType();
