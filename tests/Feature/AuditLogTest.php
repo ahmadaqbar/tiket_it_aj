@@ -54,4 +54,40 @@ class AuditLogTest extends TestCase
         $this->actingAs($this->makeAdmin())->delete("/admin/audit-logs/{$log->id}")->assertStatus(404);
         $this->assertSame(1, AuditLog::count());
     }
+
+    /** Regression BUG-01: nilai boolean setara (0 vs false) tidak boleh tercatat sebagai perubahan. */
+    public function test_unchanged_boolean_is_not_logged_as_change(): void
+    {
+        $admin = $this->makeAdmin();
+        $user = $this->makeUser(attributes: ['is_active' => false]);
+
+        $this->actingAs($admin)->put("/admin/users/{$user->id}", [
+            'name' => $user->name, 'username' => $user->username, 'email' => $user->email, 'role_id' => $user->role_id,
+            'is_active' => 0, 'unit_ids' => [$this->unit()->id],
+        ])->assertSessionHasNoErrors();
+
+        $this->assertDatabaseMissing('audit_logs', ['action' => 'user.deactivated']);
+        $this->assertDatabaseMissing('audit_logs', ['action' => 'user.updated']);
+
+        $unit = $this->unit('OMA');
+        $unit->update(['is_active' => false]);
+        $this->actingAs($admin)->put("/admin/units/{$unit->id}", [
+            'code' => 'OMA', 'name' => $unit->name, 'is_active' => 0, 'sort_order' => $unit->sort_order,
+        ])->assertSessionHasNoErrors();
+        $this->assertDatabaseMissing('audit_logs', ['action' => 'unit.updated']);
+    }
+
+    public function test_real_change_is_still_logged_with_old_and_new_values(): void
+    {
+        $user = $this->makeUser(attributes: ['name' => 'Lama']);
+
+        $this->actingAs($this->makeAdmin())->put("/admin/users/{$user->id}", [
+            'name' => 'Baru', 'username' => $user->username, 'email' => $user->email, 'role_id' => $user->role_id,
+            'is_active' => 1, 'unit_ids' => [$this->unit()->id],
+        ]);
+
+        $log = AuditLog::where('action', 'user.updated')->firstOrFail();
+        $this->assertSame(['name' => 'Lama'], $log->old_values);
+        $this->assertSame(['name' => 'Baru'], $log->new_values);
+    }
 }

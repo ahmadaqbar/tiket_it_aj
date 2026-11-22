@@ -37,16 +37,15 @@ class AuditService
     }
 
     /**
-     * Mencatat perubahan model: hanya atribut yang berubah.
+     * Mencatat perubahan model: hanya atribut yang benar-benar berubah pada save() terakhir.
+     *
+     * Memakai Model::getChanges() (perbandingan Eloquent yang memahami cast), bukan perbandingan string,
+     * agar nilai setara seperti 0 dan false tidak tercatat sebagai perubahan (BUG-01).
+     * Harus dipanggil setelah $entity->save().
      */
     public function logChanges(string $action, Model $entity, array $before, ?string $description = null): ?AuditLog
     {
-        $after = Arr::only($entity->getAttributes(), array_keys($before));
-        $changedKeys = array_keys(array_filter(
-            $after,
-            fn ($value, $key) => (string) ($before[$key] ?? '') !== (string) ($value ?? ''),
-            ARRAY_FILTER_USE_BOTH,
-        ));
+        $changedKeys = array_values(array_intersect(array_keys($entity->getChanges()), array_keys($before)));
 
         if ($changedKeys === [] && $description === null) {
             return null;
@@ -57,7 +56,7 @@ class AuditService
             $entity,
             $description,
             Arr::only($before, $changedKeys),
-            Arr::only($after, $changedKeys),
+            Arr::only($entity->getAttributes(), $changedKeys),
         );
     }
 
