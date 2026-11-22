@@ -138,3 +138,11 @@ Manual: jalur FULLTEXT pada DB dev — query memakai `MATCH`, artikel paling rel
 **Hasil: 236 test · 0 gagal** (12 test baru, `SystemSettingsTest`): default Almega utuh tanpa setting; hanya IT Admin; rebranding edisi produk
 (login, dashboard, manifest, CSS variable) + audit; prefix & batas lampiran berlaku; validasi; logo upload/serve/hapus tanpa symlink;
 SVG ditolak; toggle AI + alasan bila key kosong; API key tidak tampil; CRUD template; tugas terjadwal manual; seeder edisi produk.
+
+## Phase 7 — Analytics & Reporting (2026-11-22)
+**Hasil: 249 test · 925 assertion · 0 gagal** (13 test baru).
+- `AnalyticsTest` (8): **akurasi angka dengan data terkontrol** (total, status, selesai dalam periode, rata-rata respons 110 mnt & penyelesaian 780 mnt,
+  SLA 66,7% & 50%); tiket dibuka kembali tidak dihitung selesai; per unit/kategori/prioritas + filter unit; bucket tren & granularitas; isu berulang (≥3, unit sama);
+  rekomendasi berbasis data; preset periode; akses halaman.
+- `ReportTest` (5): Excel operasional memuat tiket & respons IT publik **tanpa catatan internal**; Excel manajemen 7 sheet dengan angka benar; PDF valid; filter unit & periode kosong; akses & validasi.
+- Browser: 5 grafik Chart.js ter-render pada 150 tiket demo; PDF operasional/manajemen & Excel terunduh; PDF manajemen dirender dan diperiksa visual.

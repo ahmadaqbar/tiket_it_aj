@@ -14,7 +14,9 @@ use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\ProfileController;
 use App\Http\Controllers\BrandingController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\It\AnalyticsController;
 use App\Http\Controllers\It\DashboardController as ItDashboardController;
+use App\Http\Controllers\It\ReportController;
 use App\Http\Controllers\It\TicketAiController;
 use App\Http\Controllers\It\TicketController as ItTicketController;
 use App\Http\Controllers\KnowledgeBaseAiController;
@@ -94,6 +96,10 @@ Route::middleware(['auth', 'active'])->group(function () {
         // ROLE: IT & IT ADMIN
         Route::middleware('role:IT,IT_ADMIN')->prefix('it')->name('it.')->group(function () {
             Route::get('/dashboard', ItDashboardController::class)->name('dashboard');
+
+            Route::get('/analytics', AnalyticsController::class)->name('analytics');
+            Route::get('/laporan', [ReportController::class, 'index'])->name('reports.index');
+            Route::get('/laporan/unduh', [ReportController::class, 'download'])->middleware('throttle:10,1')->name('reports.download');
 
             Route::get('/tiket', [ItTicketController::class, 'index'])->name('tickets.index');
             Route::get('/tiket/export', [ItTicketController::class, 'export'])->middleware('throttle:6,1')->name('tickets.export');

@@ -4,6 +4,17 @@ Format mengikuti [Keep a Changelog](https://keepachangelog.com/id-ID/1.1.0/).
 
 ## [Unreleased]
 
+## [0.8.0] — 2026-11-22 — Phase 7: Analytics, Recurring Issues, Reporting
+### Ditambahkan
+- `AnalyticsService` (agregasi SQL, definisi metrik terdokumentasi), `ReportPeriod` (Hari ini, Minggu ini, Bulan ini, Bulan lalu,
+  Tahun ini, Bulan tertentu, Kustom; granularitas harian/mingguan/bulanan otomatis).
+- Halaman **Analytics**: ringkasan status, rata-rata respons & penyelesaian, kepatuhan SLA, tren masuk vs selesai, per unit/kategori/
+  status/prioritas (Chart.js sebagai entry Vite terpisah), top 5 unit, aktivitas tim IT, isu berulang + saran pencegahan
+  + penanda artikel KB, rekomendasi tindak lanjut berbasis aturan data.
+- Halaman **Laporan**: Operasional & Manajemen, PDF (dompdf; grafik sebagai bar CSS) dan Excel (openspout; manajemen 7 sheet),
+  filter periode/bulan & unit, audit `report.generated`. Catatan internal tidak pernah dimasukkan.
+- `DemoTicketSeeder` (khusus development, menolak production) untuk demo & uji performa.
+
 ## [0.7.0] — 2026-11-22 — Phase 6: Product Configuration
 ### Ditambahkan
 - **System Settings** (IT Admin): nama aplikasi/singkat, organisasi, tim IT, kontak (email/telepon/alamat), warna utama (CSS variable

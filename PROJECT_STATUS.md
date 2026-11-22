@@ -24,8 +24,8 @@ Terakhir diperbarui: 2026-11-22 (setelah Phase 1c). Legenda: ✅ selesai & teruj
 | Knowledge Base | ✅ | Artikel, tag, visibilitas, Draft/Published/Archived, FULLTEXT + fallback, artikel terkait tiket, "jadikan artikel" dari tiket |
 | AI Assistant (opsional) | ✅ | Provider Anthropic & OpenAI-compatible; klasifikasi, troubleshooting, ringkasan, draf balasan, tanya KB; default nonaktif |
 | Product settings / branding | ✅ | System Settings: nama, organisasi, kontak, warna, logo, prefix tiket, batas upload, auto-close, KB publik, AI, template quick reply, jalankan tugas terjadwal manual; edisi `almega`/`product` |
-| Analytics & Recurring Issues | ⏳ | Phase 7 |
-| Reporting PDF/Excel | ⏳ | Phase 7 |
+| Analytics & Recurring Issues | ✅ | 6 kartu ringkasan, 5 grafik Chart.js, waktu respons/penyelesaian + SLA %, top 5 unit, aktivitas IT, isu berulang + saran pencegahan, rekomendasi berbasis data |
+| Reporting PDF/Excel | ✅ | Operasional & Manajemen; filter periode (termasuk bulanan) & unit; tanpa catatan internal |
 
 Test terakhir: **155 test lulus** (2026-11-22).
 

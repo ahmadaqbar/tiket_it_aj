@@ -79,3 +79,11 @@ Catatan kronologis keputusan dan pekerjaan. Entri terbaru di bawah.
 - Logo di storage privat + route publik (bukan symlink) karena symlink sering diblokir di shared hosting; hanya PNG/JPG/WEBP (tanpa SVG).
 - Timezone sengaja tetap di `.env` (mengubahnya setelah ada data menggeser interpretasi timestamp) — ditampilkan read-only.
 - Hasil: 236/236 test.
+
+## 2026-11-22 — Phase 7: Analytics & Reporting
+- Definisi metrik ditulis di docblock `AnalyticsService` dan DATABASE_DESIGN §6; dipakai bersama dashboard & laporan.
+- Isu berulang = ≥3 tiket unit+kategori+subkategori yang sama dalam periode; saran pencegahan berbasis aturan (bukan AI) agar tidak ada klaim tanpa data.
+- Grafik PDF memakai bar CSS (dompdf tidak menjalankan JavaScript). PDF operasional dibatasi 1.000 baris; Excel hingga 10.000.
+- Temuan: `@json([...])` dengan array literal kompleks salah di-parse Blade → data disiapkan di `@php`.
+- Temuan pada seeder demo (bukan aplikasi): `Carbon::now()` di dalam loop terpengaruh `setTestNow` → tanggal tiket bergeser mundur bertahun-tahun; diperbaiki dengan titik acuan tetap. Terdeteksi karena angka analytics tidak masuk akal — dashboard terbukti mencerminkan data apa adanya.
+- Hasil: 249/249 test; browser: 5 grafik ter-render, laporan PDF/Excel terunduh, halaman analytics ±0,6 dtk dengan 150 tiket.
