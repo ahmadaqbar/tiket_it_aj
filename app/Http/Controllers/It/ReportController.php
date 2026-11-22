@@ -41,6 +41,11 @@ class ReportController extends Controller
 
         $audit->log('report.generated', description: "Laporan {$type} ({$format}) {$period->label()}", newValues: ['type' => $type, 'format' => $format, 'unit_id' => $unitId] + $period->toArray());
 
+        // Shared hosting: naikkan batas waktu bila diizinkan (diabaikan bila set_time_limit dinonaktifkan).
+        if (function_exists('set_time_limit')) {
+            @set_time_limit(120);
+        }
+
         if ($format === 'pdf') {
             $pdf = $type === 'operational' ? $reports->operationalPdf($period, $unitId) : $reports->managementPdf($period, $unitId);
 

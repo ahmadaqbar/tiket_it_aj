@@ -87,3 +87,12 @@ Catatan kronologis keputusan dan pekerjaan. Entri terbaru di bawah.
 - Temuan: `@json([...])` dengan array literal kompleks salah di-parse Blade → data disiapkan di `@php`.
 - Temuan pada seeder demo (bukan aplikasi): `Carbon::now()` di dalam loop terpengaruh `setTestNow` → tanggal tiket bergeser mundur bertahun-tahun; diperbaiki dengan titik acuan tetap. Terdeteksi karena angka analytics tidak masuk akal — dashboard terbukti mencerminkan data apa adanya.
 - Hasil: 249/249 test; browser: 5 grafik ter-render, laporan PDF/Excel terunduh, halaman analytics ±0,6 dtk dengan 150 tiket.
+
+## 2026-11-22 — Phase 9: QA & Security
+- Audit dependensi bersih. Review grep: rute publik, raw SQL, raw output, mass assignment.
+- **SEC-01 formula injection Excel** ditemukan & diperbaiki (`SafeRow`), regression test terbukti gagal di kode lama.
+- **CON-01 deadlock penomoran** ditemukan lewat uji 8 proses paralel di DB nyata (bukan dari test unit yang berjalan serial);
+  diganti increment atomik `INSERT … ON DUPLICATE KEY UPDATE` + retry transaksi. 16 proses × 25 tiket: 0 error, 0 duplikat.
+- Batas PDF operasional diturunkan 1.000 → 500 baris setelah uji performa.
+- `AccessMatrixTest` menelusuri seluruh rute GET — rute baru otomatis ikut diuji otorisasinya.
+- Hasil: 255/255 test.

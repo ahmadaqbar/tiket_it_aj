@@ -16,6 +16,9 @@ use Throwable;
 
 class TicketService
 {
+    /** Transaksi diulang otomatis bila terjadi deadlock/serialization failure (lapisan pertahanan kedua). */
+    public const TRANSACTION_ATTEMPTS = 3;
+
     public function __construct(
         private readonly TicketNumberService $numbers,
         private readonly AttachmentService $attachments,
@@ -76,7 +79,7 @@ class TicketService
                 $this->notifications->ticketCreated($ticket, $reporter);
 
                 return $ticket;
-            });
+            }, attempts: self::TRANSACTION_ATTEMPTS);
         } catch (Throwable $e) {
             $this->attachments->discardWritten();
             throw $e;

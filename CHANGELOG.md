@@ -4,6 +4,16 @@ Format mengikuti [Keep a Changelog](https://keepachangelog.com/id-ID/1.1.0/).
 
 ## [Unreleased]
 
+## [0.9.0] — 2026-11-22 — Phase 9: QA & Security
+### Keamanan
+- **Diperbaiki SEC-01:** formula injection pada export/laporan Excel (string berawalan `=` menjadi formula). Semua teks kini ditulis sebagai sel teks.
+- Tautan kembali detail tiket tidak lagi memakai Referer eksternal.
+### Diperbaiki
+- **CON-01:** deadlock InnoDB pada penomoran tiket saat banyak laporan masuk bersamaan; kini increment atomik + retry transaksi.
+- PDF laporan operasional dibatasi 500 baris & time limit dinaikkan bila diizinkan hosting.
+### Ditambahkan
+- Test matriks akses seluruh rute GET, test security header, test formula injection.
+
 ## [0.8.0] — 2026-11-22 — Phase 7: Analytics, Recurring Issues, Reporting
 ### Ditambahkan
 - `AnalyticsService` (agregasi SQL, definisi metrik terdokumentasi), `ReportPeriod` (Hari ini, Minggu ini, Bulan ini, Bulan lalu,

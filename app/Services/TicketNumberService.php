@@ -9,7 +9,7 @@ use LogicException;
 
 /**
  * Nomor tiket: {PREFIX}-{UNIT}-{YYYYMMDD}-{SEQ}, mis. IT-DR-20261122-001.
- * Sequence per unit per hari, dikunci dengan SELECT ... FOR UPDATE (InnoDB row lock).
+ * Sequence per unit per hari, di-increment atomik dengan INSERT ... ON DUPLICATE KEY UPDATE (InnoDB row lock).
  * WAJIB dipanggil di dalam transaksi yang sama dengan insert tiket, sehingga bila insert gagal
  * sequence ikut di-rollback dan nomor tidak pernah terpakai ganda.
  */
@@ -28,25 +28,21 @@ class TicketNumberService
         $at ??= now();
         $date = $at->toDateString();
 
-        DB::table('ticket_sequences')->insertOrIgnore([
-            'unit_id' => $unit->id,
-            'ticket_date' => $date,
-            'last_number' => 0,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        // Increment atomik: INSERT ... ON DUPLICATE KEY UPDATE langsung mengambil exclusive lock pada baris
+        // (unit_id, ticket_date). Pola lama INSERT IGNORE + SELECT FOR UPDATE memicu deadlock InnoDB saat
+        // banyak laporan masuk bersamaan (shared lock → exclusive lock). Ditemukan pada uji konkurensi Phase 9.
+        DB::table('ticket_sequences')->upsert(
+            [['unit_id' => $unit->id, 'ticket_date' => $date, 'last_number' => 1, 'created_at' => now(), 'updated_at' => now()]],
+            ['unit_id', 'ticket_date'],
+            ['last_number' => DB::raw('last_number + 1'), 'updated_at' => now()],
+        );
 
-        $sequence = DB::table('ticket_sequences')
+        // Baris sudah terkunci oleh transaksi ini sampai commit, sehingga nilai yang dibaca adalah milik kita.
+        $number = (int) DB::table('ticket_sequences')
             ->where('unit_id', $unit->id)
             ->where('ticket_date', $date)
             ->lockForUpdate()
-            ->first();
-
-        $number = $sequence->last_number + 1;
-
-        DB::table('ticket_sequences')
-            ->where('id', $sequence->id)
-            ->update(['last_number' => $number, 'updated_at' => now()]);
+            ->value('last_number');
 
         return sprintf('%s-%s-%s-%03d', $this->prefix(), $unit->code, $at->format('Ymd'), $number);
     }

@@ -11,9 +11,9 @@ use App\Models\Unit;
 use App\Models\User;
 use App\Support\Branding;
 use App\Support\ReportPeriod;
+use App\Support\SafeRow;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Collection;
-use OpenSpout\Common\Entity\Row;
 use OpenSpout\Common\Entity\Style\Style;
 use OpenSpout\Writer\XLSX\Writer;
 
@@ -23,7 +23,7 @@ use OpenSpout\Writer\XLSX\Writer;
 class ReportService
 {
     /** dompdf berat untuk ribuan baris di shared hosting — PDF dibatasi, Excel untuk data lengkap. */
-    public const PDF_MAX_ROWS = 1000;
+    public const PDF_MAX_ROWS = 500; // ±7 dtk per 500 baris pada uji performa; aman untuk max_execution_time 30 dtk
 
     public const XLSX_MAX_ROWS = 10000;
 
@@ -80,13 +80,13 @@ class ReportService
         $writer = $this->writer($path);
         $writer->getCurrentSheet()->setName('Operasional');
         $bold = (new Style)->setFontBold();
-        $writer->addRow(Row::fromValues(['Laporan Operasional IT — '.Branding::organization()], $bold));
-        $writer->addRow(Row::fromValues(['Periode', $period->label()]));
-        $writer->addRow(Row::fromValues([]));
-        $writer->addRow(Row::fromValues(['No. Tiket', 'Tanggal', 'Unit', 'Pelapor', 'Kategori', 'Subkategori', 'Judul', 'Deskripsi', 'Respons IT', 'Prioritas', 'Status', 'PIC', 'Selesai', 'Durasi Penanganan (menit)'], $bold));
+        $writer->addRow(SafeRow::make(['Laporan Operasional IT — '.Branding::organization()], $bold));
+        $writer->addRow(SafeRow::make(['Periode', $period->label()]));
+        $writer->addRow(SafeRow::make([]));
+        $writer->addRow(SafeRow::make(['No. Tiket', 'Tanggal', 'Unit', 'Pelapor', 'Kategori', 'Subkategori', 'Judul', 'Deskripsi', 'Respons IT', 'Prioritas', 'Status', 'PIC', 'Selesai', 'Durasi Penanganan (menit)'], $bold));
 
         foreach ($this->operationalRows($period, $unitId, self::XLSX_MAX_ROWS) as $t) {
-            $writer->addRow(Row::fromValues([
+            $writer->addRow(SafeRow::make([
                 $t->ticket_number, $t->created_at->format('Y-m-d H:i'), $t->unit->code, $t->reporter?->name, $t->category->name,
                 $t->subcategory?->name ?? '', $t->title, mb_substr($t->description, 0, 1000), mb_substr((string) $t->it_response, 0, 1000),
                 $t->priority->label(), $t->status->label(), $t->assignee?->name ?? '', $t->resolved_at?->format('Y-m-d H:i') ?? '',
@@ -108,9 +108,9 @@ class ReportService
                 $writer->addNewSheetAndMakeItCurrent();
             }
             $writer->getCurrentSheet()->setName($name);
-            $writer->addRow(Row::fromValues($headers, $bold));
+            $writer->addRow(SafeRow::make($headers, $bold));
             foreach ($rows as $row) {
-                $writer->addRow(Row::fromValues(array_values($row)));
+                $writer->addRow(SafeRow::make(array_values($row)));
             }
         };
 

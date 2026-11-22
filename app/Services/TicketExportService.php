@@ -3,8 +3,8 @@
 namespace App\Services;
 
 use App\Models\Ticket;
+use App\Support\SafeRow;
 use Illuminate\Database\Eloquent\Builder;
-use OpenSpout\Common\Entity\Row;
 use OpenSpout\Common\Entity\Style\Style;
 use OpenSpout\Writer\XLSX\Writer;
 
@@ -24,7 +24,7 @@ class TicketExportService
         $path = tempnam(sys_get_temp_dir(), 'tiket').'.xlsx';
         $writer = new Writer;
         $writer->openToFile($path);
-        $writer->addRow(Row::fromValues(self::HEADERS, (new Style)->setFontBold()));
+        $writer->addRow(SafeRow::make(self::HEADERS, (new Style)->setFontBold()));
 
         $rows = 0;
         $query->with(['unit:id,code', 'reporter:id,name', 'category:id,name', 'subcategory:id,name', 'assignee:id,name'])
@@ -32,7 +32,7 @@ class TicketExportService
             ->chunk(500, function ($tickets) use ($writer, &$rows) {
                 foreach ($tickets as $t) {
                     /** @var Ticket $t */
-                    $writer->addRow(Row::fromValues([
+                    $writer->addRow(SafeRow::make([
                         $t->ticket_number,
                         $t->created_at->format('Y-m-d H:i'),
                         $t->unit->code,

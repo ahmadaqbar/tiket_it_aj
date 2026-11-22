@@ -146,3 +146,58 @@ SVG ditolak; toggle AI + alasan bila key kosong; API key tidak tampil; CRUD temp
   rekomendasi berbasis data; preset periode; akses halaman.
 - `ReportTest` (5): Excel operasional memuat tiket & respons IT publik **tanpa catatan internal**; Excel manajemen 7 sheet dengan angka benar; PDF valid; filter unit & periode kosong; akses & validasi.
 - Browser: 5 grafik Chart.js ter-render pada 150 tiket demo; PDF operasional/manajemen & Excel terunduh; PDF manajemen dirender dan diperiksa visual.
+
+## Phase 9 — QA & Security (2026-11-22)
+
+**Hasil: 255 test · 1.054 assertion · 0 gagal.**
+
+### Audit & Review
+| Pemeriksaan | Hasil |
+|---|---|
+| `composer audit` | Tidak ada advisory |
+| `npm audit` | 0 kerentanan |
+| Rute tanpa autentikasi | Hanya `login`, `qr/{token}` (throttle), `manifest.webmanifest`, `branding/logo`, `up` — sesuai desain |
+| Raw SQL | Hanya string konstan atau parameter binding (pencarian KB) |
+| `{!! !!}` | SVG QR (dihasilkan library dari URL internal) & 2 string statis |
+| Mass assignment | Tidak ada `$request->all()`; controller memakai `validated()`/`safe()` |
+| N+1 | `preventLazyLoading` aktif di non-production; seluruh test (termasuk halaman daftar) lulus tanpa pelanggaran |
+
+### Temuan & Perbaikan
+| # | Temuan | Dampak | Perbaikan | Bukti |
+|---|---|---|---|---|
+| SEC-01 | **Formula injection Excel**: `Cell::fromValue()` openspout mengubah string berawalan `=` (mis. judul tiket `=HYPERLINK(...)`) menjadi sel formula | File export/laporan dapat memuat formula aktif buatan user | `App\Support\SafeRow` — semua string ditulis sebagai `StringCell` | `SpreadsheetInjectionTest`: **gagal di kode lama, lulus setelah perbaikan** (tidak ada `<f>` di XML sheet) |
+| CON-01 | **Deadlock penomoran tiket** saat laporan masuk bersamaan (`INSERT IGNORE` + `SELECT FOR UPDATE` → shared lock lalu exclusive lock) | 142 dari 200 pembuatan tiket gagal (error 1213) pada 8 proses paralel; **tidak ada nomor ganda** | Increment atomik `INSERT … ON DUPLICATE KEY UPDATE last_number = last_number + 1` + retry transaksi (3×) | Lihat uji konkurensi di bawah |
+| SEC-02 | Tautan "kembali" detail tiket IT memakai Referer | Potensi open redirect bila Referer eksternal mengandung `/it/tiket` | Hanya dipakai bila diawali URL antrean aplikasi | Review kode |
+| PERF-01 | PDF operasional ±7,5 dtk / bulan data | Risiko `max_execution_time` 30 dtk di shared hosting | Batas PDF 500 baris + `set_time_limit(120)` bila diizinkan; Excel untuk data lengkap | Uji performa |
+
+### Uji Konkurensi Penomoran (DB nyata, InnoDB, proses PHP paralel)
+| Skenario | Sebelum perbaikan | Setelah perbaikan |
+|---|---|---|
+| 8 proses × 25 tiket, unit sama, waktu bersamaan | 58/200 berhasil, 142 deadlock, 0 duplikat | **200/200 berhasil, 0 error, 200 nomor unik, berurutan tanpa celah (059→258)** |
+| 16 proses × 25 tiket | — | **400/400 berhasil, 0 error, 400 nomor unik** |
+
+### Uji Performa (DB dev ±5.800 tiket, `php artisan serve`, median 3 request)
+| Halaman | Waktu |
+|---|---|
+| Dashboard IT | 52 ms |
+| Antrean tiket (default / cari / filter+urut prioritas / lewat SLA hal. 5) | 50–63 ms |
+| Analytics bulan ini / tahun ini | 98 / 114 ms |
+| Knowledge Base | 32 ms |
+| Export antrean XLSX (5.800 baris, 331 KB) | 1,4 dtk |
+| Laporan manajemen XLSX (tahun ini) | 0,13 dtk |
+| Laporan operasional PDF (bulan lalu) | 7,5 dtk → batas diturunkan ke 500 baris |
+
+Catatan: shared hosting umumnya lebih lambat dari lingkungan uji; angka di atas menjadi baseline.
+
+### Matriks Akses Otomatis (`AccessMatrixTest`)
+Menelusuri **seluruh rute GET** (rute baru otomatis ikut teruji): tamu selalu diarahkan ke login kecuali rute publik;
+USER mendapat 403/404 di semua rute `it/*`, `admin/*`, dan penulisan KB (25 rute); IT mendapat 403 di semua rute `admin/*`; security header ada.
+
+### Backup & Restore (skema lengkap)
+`mysqldump --single-transaction` → gzip (445 KB) → restore ke DB baru: jumlah baris identik untuk users, units, tickets (5.807),
+ticket_replies, ticket_histories, kb_articles, audit_logs, settings, notifications (2.421), ai_requests. Index FULLTEXT ikut ter-restore.
+
+### Belum Diuji / Batasan
+- Uji di shared hosting aktual (spesifikasi belum tersedia) — Phase 10 menyiapkan paket & checklist.
+- Uji beban HTTP konkuren (banyak user membuka halaman bersamaan) belum dilakukan; konkurensi tulis yang kritis (penomoran) sudah diuji.
+- Panggilan ke API AI sungguhan (berbayar) tidak dilakukan; diganti Fake provider, `Http::fake`, dan stub lokal berformat Anthropic.

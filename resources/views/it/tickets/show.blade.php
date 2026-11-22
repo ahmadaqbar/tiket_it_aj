@@ -9,7 +9,9 @@
 @endphp
 <x-layouts::app :title="$ticket->ticket_number">
     <div class="mb-4 flex items-center justify-between">
-        <a href="{{ url()->previous() !== url()->current() && str_contains(url()->previous(), '/it/tiket') ? url()->previous() : route('it.tickets.index') }}" class="text-sm text-gray-500 hover:text-gray-800">&larr; Antrean tiket</a>
+        {{-- Kembali ke antrean beserta filternya, hanya bila halaman sebelumnya adalah antrean aplikasi ini (bukan Referer eksternal). --}}
+        @php $back = url()->previous(); @endphp
+        <a href="{{ str_starts_with($back, route('it.tickets.index')) && $back !== url()->current() ? $back : route('it.tickets.index') }}" class="text-sm text-gray-500 hover:text-gray-800">&larr; Antrean tiket</a>
     </div>
 
     @if ($errors->any())
