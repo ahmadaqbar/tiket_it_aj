@@ -6,7 +6,7 @@ use App\Models\Unit;
 use Illuminate\Database\Seeder;
 
 /**
- * 15 unit operasional PT Almega Jaya Group.
+ * Edisi Almega: 15 unit operasional PT Almega Jaya Group. Edisi produk: 1 unit awal generik.
  * Idempotent: unit yang sudah ada tidak diubah token QR-nya.
  */
 class UnitSeeder extends Seeder
@@ -29,9 +29,16 @@ class UnitSeeder extends Seeder
         ['STZ', 'Stanza Working Space'],
     ];
 
+    /** Edisi produk: satu unit awal generik; organisasi menambah unitnya sendiri lewat Unit Management. */
+    public const PRODUCT_UNITS = [
+        ['HQ', 'Kantor Pusat'],
+    ];
+
     public function run(): void
     {
-        foreach (self::UNITS as $index => [$code, $name]) {
+        $units = config('helpdesk.edition') === 'almega' ? self::UNITS : self::PRODUCT_UNITS;
+
+        foreach ($units as $index => [$code, $name]) {
             $unit = Unit::firstOrNew(['code' => $code]);
 
             if (! $unit->exists) {

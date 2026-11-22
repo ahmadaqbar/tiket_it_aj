@@ -4,6 +4,15 @@ Format mengikuti [Keep a Changelog](https://keepachangelog.com/id-ID/1.1.0/).
 
 ## [Unreleased]
 
+## [0.7.0] — 2026-11-22 — Phase 6: Product Configuration
+### Ditambahkan
+- **System Settings** (IT Admin): nama aplikasi/singkat, organisasi, tim IT, kontak (email/telepon/alamat), warna utama (CSS variable
+  override tanpa build ulang), logo (disimpan privat, disajikan via `/branding/logo` tanpa `storage:link`), prefix nomor tiket,
+  auto-close, batas lampiran, pusat bantuan, Asisten AI (+ status provider/model, statistik token, tanpa menampilkan API key).
+- Kelola template balasan cepat; tombol **Jalankan Tugas Terjadwal** untuk hosting tanpa Cron (khusus IT Admin, diaudit).
+- Kontak IT tampil di halaman login & dashboard user; manifest PWA mengikuti warna & nama.
+- Edisi `product` (`HELPDESK_EDITION=product`): default branding generik & 1 unit awal `HQ`. Edisi `almega` tidak berubah.
+
 ## [0.6.0] — 2026-11-22 — Phase 3–5: AI Foundation, AI Ticket Assistance, AI Knowledge Base
 ### Ditambahkan
 - `config/ai.php`, tabel `ai_requests` (metadata saja), `AiProvider` (Anthropic, OpenAI-compatible, Fake), `AiManager`, `AiGateway`

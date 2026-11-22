@@ -72,3 +72,10 @@ Catatan kronologis keputusan dan pekerjaan. Entri terbaru di bawah.
 - Smoke test end-to-end memakai stub lokal berformat Anthropic Messages API (AI_BASE_URL=127.0.0.1) — tanpa biaya API;
   `.env` dikembalikan setelahnya, AI dev dinonaktifkan kembali.
 - Hasil: 224/224 test.
+
+## 2026-11-22 — Phase 6: Product Configuration
+- Konfigurasi tiga lapis: tabel `settings` (UI) → `config/helpdesk.php` (edisi, .env) → default kode = nilai Almega.
+- Warna tema: Tailwind v4 memakai `var(--color-brand-*)` → override `:root` per instalasi, tanpa build ulang. Default tidak menyuntikkan CSS.
+- Logo di storage privat + route publik (bukan symlink) karena symlink sering diblokir di shared hosting; hanya PNG/JPG/WEBP (tanpa SVG).
+- Timezone sengaja tetap di `.env` (mengubahnya setelah ada data menggeser interpretasi timestamp) — ditampilkan read-only.
+- Hasil: 236/236 test.

@@ -3,6 +3,8 @@
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\QrCodeController;
+use App\Http\Controllers\Admin\QuickReplyTemplateController;
+use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\SlaPolicyController;
 use App\Http\Controllers\Admin\UnitController;
 use App\Http\Controllers\Admin\UserController;
@@ -10,6 +12,7 @@ use App\Http\Controllers\AttachmentController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\ProfileController;
+use App\Http\Controllers\BrandingController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\It\DashboardController as ItDashboardController;
 use App\Http\Controllers\It\TicketAiController;
@@ -28,6 +31,7 @@ use Illuminate\Support\Facades\Route;
 | Tidak ada registrasi publik. Seluruh akun dibuat oleh IT Admin.
 */
 
+Route::get('/branding/logo', [BrandingController::class, 'logo'])->name('branding.logo');
 Route::get('/manifest.webmanifest', [PwaController::class, 'manifest'])->name('pwa.manifest');
 
 // QR unit: publik, hanya mengidentifikasi unit lalu mengarahkan ke login / form laporan.
@@ -126,6 +130,13 @@ Route::middleware(['auth', 'active'])->group(function () {
 
             Route::get('sla', [SlaPolicyController::class, 'index'])->name('sla.index');
             Route::put('sla/{slaPolicy}', [SlaPolicyController::class, 'update'])->name('sla.update');
+
+            Route::get('settings', [SettingsController::class, 'index'])->name('settings.index');
+            Route::put('settings', [SettingsController::class, 'update'])->name('settings.update');
+            Route::post('settings/run-tasks', [SettingsController::class, 'runScheduledTasks'])->middleware('throttle:3,1')->name('settings.run-tasks');
+            Route::post('settings/templates', [QuickReplyTemplateController::class, 'store'])->name('templates.store');
+            Route::put('settings/templates/{template}', [QuickReplyTemplateController::class, 'update'])->name('templates.update');
+            Route::delete('settings/templates/{template}', [QuickReplyTemplateController::class, 'destroy'])->name('templates.destroy');
 
             Route::get('audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
         });

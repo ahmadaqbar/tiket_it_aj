@@ -47,4 +47,15 @@
             </ul>
         @endif
     </div>
+    @php $contact = \App\Support\Branding::contact(); @endphp
+    @if (array_filter($contact))
+        <div class="card mt-6 p-5 text-sm">
+            <h2 class="font-semibold text-gray-900">Kontak {{ \App\Support\Branding::supportTeam() }}</h2>
+            <dl class="mt-2 space-y-1 text-gray-600">
+                @if ($contact['phone'])<div>Telepon/WA: <span class="font-medium text-gray-900">{{ $contact['phone'] }}</span></div>@endif
+                @if ($contact['email'])<div>Email: <span class="font-medium text-gray-900">{{ $contact['email'] }}</span></div>@endif
+                @if ($contact['address'])<div>Lokasi: {{ $contact['address'] }}</div>@endif
+            </dl>
+        </div>
+    @endif
 </x-layouts::app>

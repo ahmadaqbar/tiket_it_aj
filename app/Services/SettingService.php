@@ -18,9 +18,15 @@ class SettingService
         return $all[$key] ?? $default;
     }
 
-    public function set(string $key, mixed $value): void
+    public function set(string $key, mixed $value, ?string $type = null): void
     {
-        Setting::updateOrCreate(['key' => $key], ['value' => is_bool($value) ? (int) $value : $value]);
+        $attributes = ['value' => is_bool($value) ? (int) $value : $value];
+        if ($type !== null) {
+            $attributes['type'] = $type;
+        } elseif (! Setting::where('key', $key)->exists()) {
+            $attributes['type'] = is_bool($value) ? 'bool' : (is_int($value) ? 'int' : 'string');
+        }
+        Setting::updateOrCreate(['key' => $key], $attributes);
         Cache::forget(self::CACHE_KEY);
     }
 

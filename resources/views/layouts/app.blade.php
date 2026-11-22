@@ -10,13 +10,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="theme-color" content="#16432b">
+    <meta name="theme-color" content="{{ \App\Support\Branding::primaryColor() }}">
     <title>{{ isset($title) ? $title.' · ' : '' }}{{ \App\Support\Branding::shortName() }}</title>
     <link rel="manifest" href="{{ route('pwa.manifest') }}">
     <link rel="icon" href="{{ asset('icons/icon-192.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('icons/icon-192.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
+    @if ($themeCss = \App\Support\Branding::themeCss())<style>{{ $themeCss }}</style>@endif
 </head>
 <body class="min-h-screen" x-data="{ sidebarOpen: false }" @keydown.escape.window="sidebarOpen = false">
 
@@ -28,7 +29,11 @@
            :class="{ 'translate-x-0': sidebarOpen }" aria-label="Navigasi utama">
         <div class="flex h-16 items-center justify-between border-b border-gray-100 px-5">
             <a href="{{ route('home') }}" class="flex items-center gap-2">
-                <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-700 text-sm font-bold text-white">IT</span>
+                @if ($logo = \App\Support\Branding::logoUrl())
+                    <img src="{{ $logo }}" alt="Logo" class="h-8 w-auto max-w-[3rem] object-contain">
+                @else
+                    <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-700 text-sm font-bold text-white">IT</span>
+                @endif
                 <span class="leading-tight">
                     <span class="block text-sm font-semibold text-gray-900">{{ \App\Support\Branding::shortName() }}</span>
                     <span class="block text-[11px] text-gray-500">Ticketing System</span>

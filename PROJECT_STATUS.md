@@ -23,7 +23,7 @@ Terakhir diperbarui: 2026-11-22 (setelah Phase 1c). Legenda: ✅ selesai & teruj
 | PWA-ready | ✅ | Manifest dinamis, ikon, service worker offline minimal |
 | Knowledge Base | ✅ | Artikel, tag, visibilitas, Draft/Published/Archived, FULLTEXT + fallback, artikel terkait tiket, "jadikan artikel" dari tiket |
 | AI Assistant (opsional) | ✅ | Provider Anthropic & OpenAI-compatible; klasifikasi, troubleshooting, ringkasan, draf balasan, tanya KB; default nonaktif |
-| Product settings / branding | ⏳ | Phase 6 |
+| Product settings / branding | ✅ | System Settings: nama, organisasi, kontak, warna, logo, prefix tiket, batas upload, auto-close, KB publik, AI, template quick reply, jalankan tugas terjadwal manual; edisi `almega`/`product` |
 | Analytics & Recurring Issues | ⏳ | Phase 7 |
 | Reporting PDF/Excel | ⏳ | Phase 7 |
 

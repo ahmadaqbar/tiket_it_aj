@@ -16,7 +16,7 @@ class PwaController extends Controller
             'scope' => '/',
             'display' => 'standalone',
             'background_color' => '#f9fafb',
-            'theme_color' => '#16432b',
+            'theme_color' => Branding::primaryColor(),
             'lang' => 'id',
             'icons' => [
                 ['src' => asset('icons/icon-192.png'), 'sizes' => '192x192', 'type' => 'image/png'],

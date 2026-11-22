@@ -133,3 +133,8 @@ Manual: jalur FULLTEXT pada DB dev — query memakai `MATCH`, artikel paling rel
 - `KnowledgeBaseAiTest` (5): referensi tervalidasi; tanpa artikel → bukan "berdasarkan KB" walau model mengklaim; draft/arsip tidak dikirim; validasi; halaman nonaktif.
 - `Unit/AiRedactionTest` (10): pola redaksi, data teknis (IP, jam, nomor tiket) tetap utuh, pembungkus data, ekstraksi JSON.
 - Browser (stub lokal berformat Anthropic): klasifikasi → isi form (belum tersimpan), draf → textarea (belum terkirim), tanya KB; `ai_requests` tercatat; tanpa error JS.
+
+## Phase 6 — Product Configuration (2026-11-22)
+**Hasil: 236 test · 0 gagal** (12 test baru, `SystemSettingsTest`): default Almega utuh tanpa setting; hanya IT Admin; rebranding edisi produk
+(login, dashboard, manifest, CSS variable) + audit; prefix & batas lampiran berlaku; validasi; logo upload/serve/hapus tanpa symlink;
+SVG ditolak; toggle AI + alasan bila key kosong; API key tidak tampil; CRUD template; tugas terjadwal manual; seeder edisi produk.
