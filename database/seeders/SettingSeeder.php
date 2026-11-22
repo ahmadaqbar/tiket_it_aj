@@ -12,6 +12,7 @@ class SettingSeeder extends Seeder
         ['ticket.auto_close_days', '3', 'int', 'Tiket Resolved otomatis Closed setelah (hari)'],
         ['upload.max_kb', '5120', 'int', 'Ukuran maksimum lampiran (KB)'],
         ['upload.max_files', '5', 'int', 'Jumlah maksimum lampiran per kiriman'],
+        ['kb.public_enabled', '1', 'bool', 'Pusat bantuan (artikel publik) dapat diakses user'],
         ['organization.name', 'PT Almega Jaya Group', 'string', 'Nama organisasi'],
     ];
 

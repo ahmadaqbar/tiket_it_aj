@@ -13,6 +13,7 @@ use App\Models\Unit;
 use App\Models\User;
 use App\Services\AttachmentService;
 use App\Services\AuditService;
+use App\Services\KnowledgeBaseService;
 use App\Services\TicketExportService;
 use App\Services\TicketStatusService;
 use App\Support\TicketQueueFilter;
@@ -42,7 +43,7 @@ class TicketController extends Controller
         ]);
     }
 
-    public function show(Request $request, Ticket $ticket, TicketStatusService $status, AttachmentService $attachments): View
+    public function show(Request $request, Ticket $ticket, TicketStatusService $status, AttachmentService $attachments, KnowledgeBaseService $kb): View
     {
         $this->authorize('manage', $ticket);
 
@@ -67,6 +68,7 @@ class TicketController extends Controller
             'priorities' => TicketPriority::cases(),
             'maxKb' => $attachments->maxKilobytes(),
             'maxFiles' => $attachments->maxFiles(),
+            'relatedArticles' => $kb->relatedForTicket($ticket, $request->user()),
         ]);
     }
 

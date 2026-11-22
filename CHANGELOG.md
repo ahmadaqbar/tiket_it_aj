@@ -4,6 +4,14 @@ Format mengikuti [Keep a Changelog](https://keepachangelog.com/id-ID/1.1.0/).
 
 ## [Unreleased]
 
+## [0.5.0] — 2026-11-22 — Phase 2: Knowledge Base
+### Ditambahkan
+- Tabel `kb_articles` (FULLTEXT index), `kb_tags`, `kb_article_tag`; kategori memakai tabel `categories` tiket.
+- Menu **Knowledge Base** (IT) dan **Bantuan** (User, bila `kb.public_enabled`), pencarian FULLTEXT + fallback LIKE, filter kategori/tag/status/visibilitas.
+- Siklus Draft → Published → Archived, audit log, hitung tampilan per sesi.
+- Panel "Artikel KB Terkait" dan "Jadikan artikel" di detail tiket IT (tanpa catatan internal).
+- `KNOWLEDGE_BASE_GUIDE.md`.
+
 ## [0.4.0] — 2026-11-22 — Phase 1d: QR & Notifikasi
 ### Ditambahkan
 - `/qr/{token}` (publik, rate limit 30/menit): unit tersimpan di sesi → login → form laporan dengan unit terisi; sumber tiket `QR`.

@@ -27,6 +27,8 @@
 | 13 | `sla_policies` | Target respons & penyelesaian per prioritas | 2 ✅ |
 | 14 | `notifications` | Laravel database notification | 4 |
 | 15 | `audit_logs` | Jejak audit | 1 |
+| + | `kb_articles`, `kb_tags`, `kb_article_tag` | Knowledge Base (FULLTEXT pada title, problem, symptoms, steps, resolution) | Phase 2 ✅ |
+| + | `notifications` | Notifikasi in-app | Phase 1d ✅ |
 | + | `settings` | Konfigurasi aplikasi (key-value) | 1 |
 | + | `quick_reply_templates` | Template balasan cepat IT (6 template awal) | 3 ✅ |
 | + | `sessions`, `cache`, `cache_locks`, `jobs`, `job_batches`, `failed_jobs` | Infrastruktur Laravel (driver database, tanpa Redis) | 1 |
@@ -245,3 +247,12 @@ NEW ──► IN_PROGRESS ◄──► PENDING
 | Response time | `first_response_at − created_at` (tiket yang sudah direspons) |
 | Resolution time | `resolved_at − created_at` (tiket yang sudah resolved) |
 | Recurring issue | Kombinasi unit + kategori + subkategori dengan ≥ 3 tiket dalam rentang |
+
+## 7. Knowledge Base (Phase 2)
+
+`kb_articles`: id, title, slug UNIQUE, category_id FK NULL → categories, subcategory_id FK NULL, problem, symptoms NULL,
+root_cause NULL, steps, resolution NULL, visibility (`INTERNAL`/`PUBLIC`), status (`DRAFT`/`PUBLISHED`/`ARCHIVED`),
+author_id FK, updated_by FK NULL, source_ticket_id FK NULL → tickets, view_count, published_at, archived_at, timestamps.
+Index: (status, visibility), FULLTEXT `kb_articles_fulltext`.
+`kb_tags`: id, name, slug UNIQUE. `kb_article_tag`: (kb_article_id, kb_tag_id) PK.
+Kategori KB = kategori tiket (keputusan: hindari tabel duplikat, relevansi tiket↔artikel).

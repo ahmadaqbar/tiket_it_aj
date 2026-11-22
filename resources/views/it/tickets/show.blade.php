@@ -103,6 +103,19 @@
                 </form>
             @endunless
 
+            {{-- Knowledge Base terkait --}}
+            <div class="card p-5">
+                <div class="mb-3 flex items-center justify-between">
+                    <h2 class="text-sm font-semibold text-gray-900">Artikel KB Terkait</h2>
+                    <a href="{{ route('kb.create', ['from_ticket' => $ticket->public_id]) }}" class="text-xs text-brand-700 hover:underline">Jadikan artikel</a>
+                </div>
+                @forelse ($relatedArticles as $kbArticle)
+                    <a href="{{ route('kb.show', $kbArticle) }}" class="block rounded-lg px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-50">{{ $kbArticle->title }}</a>
+                @empty
+                    <p class="text-xs text-gray-500">Belum ada artikel yang relevan.</p>
+                @endforelse
+            </div>
+
             {{-- Info --}}
             <div class="card p-5">
                 <h2 class="mb-3 text-sm font-semibold text-gray-900">Informasi</h2>

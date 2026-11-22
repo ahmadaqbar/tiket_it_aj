@@ -13,6 +13,7 @@ use App\Http\Controllers\Auth\ProfileController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\It\DashboardController as ItDashboardController;
 use App\Http\Controllers\It\TicketController as ItTicketController;
+use App\Http\Controllers\KnowledgeBaseController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PwaController;
 use App\Http\Controllers\QrController;
@@ -54,6 +55,17 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::get('/notifikasi', [NotificationController::class, 'index'])->name('notifications.index');
         Route::get('/notifikasi/{id}', [NotificationController::class, 'open'])->name('notifications.open');
         Route::post('/notifikasi/baca-semua', [NotificationController::class, 'readAll'])->name('notifications.read-all');
+
+        // Knowledge Base: baca untuk semua role (Policy membatasi), tulis untuk IT.
+        Route::get('/kb', [KnowledgeBaseController::class, 'index'])->name('kb.index');
+        Route::middleware('role:IT,IT_ADMIN')->group(function () {
+            Route::get('/kb/baru', [KnowledgeBaseController::class, 'create'])->name('kb.create');
+            Route::post('/kb', [KnowledgeBaseController::class, 'store'])->name('kb.store');
+            Route::get('/kb/{article}/ubah', [KnowledgeBaseController::class, 'edit'])->name('kb.edit');
+            Route::put('/kb/{article}', [KnowledgeBaseController::class, 'update'])->name('kb.update');
+            Route::post('/kb/{article}/{action}', [KnowledgeBaseController::class, 'transition'])->whereIn('action', ['publish', 'archive', 'draft'])->name('kb.transition');
+        });
+        Route::get('/kb/{article}', [KnowledgeBaseController::class, 'show'])->name('kb.show');
 
         // Balasan tiket (pelapor & IT). Visibilitas & hak akses diperiksa di ReplyRequest + service.
         Route::post('/tiket/{ticket}/balasan', [TicketActionController::class, 'reply'])->middleware('throttle:tickets')->name('tickets.reply');

@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use App\Models\KbArticle;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
@@ -25,6 +26,7 @@ class Navigation
                     ['label' => 'Buat Laporan', 'route' => 'user.tickets.create', 'icon' => 'plus'],
                     ['label' => 'Tiket Saya', 'route' => 'user.tickets.index', 'icon' => 'ticket'],
                     ['label' => 'Riwayat', 'route' => 'user.tickets.history', 'icon' => 'clock'],
+                    ['label' => 'Bantuan', 'route' => 'kb.index', 'icon' => 'book', 'active' => 'kb.*', 'gate' => 'viewAny-kb'],
                     ['label' => 'Profil', 'route' => 'profile.show', 'icon' => 'user'],
                 ],
             ]];
@@ -39,6 +41,7 @@ class Navigation
                     ['label' => 'Pending', 'route' => 'it.tickets.index', 'params' => ['status' => 'PENDING'], 'icon' => 'pause'],
                     ['label' => 'Resolved', 'route' => 'it.tickets.index', 'params' => ['status' => 'RESOLVED'], 'icon' => 'check'],
                     ['label' => 'Closed', 'route' => 'it.tickets.index', 'params' => ['status' => 'CLOSED'], 'icon' => 'archive'],
+                    ['label' => 'Knowledge Base', 'route' => 'kb.index', 'icon' => 'book', 'active' => 'kb.*'],
                     ['label' => 'Analytics', 'route' => 'it.analytics', 'icon' => 'chart'],
                     ['label' => 'Reports', 'route' => 'it.reports.index', 'icon' => 'document'],
                 ],
@@ -61,7 +64,8 @@ class Navigation
         }
 
         foreach ($sections as &$section) {
-            $section['items'] = array_values(array_filter($section['items'], fn ($item) => Route::has($item['route'])));
+            $section['items'] = array_values(array_filter($section['items'], fn ($item) => Route::has($item['route'])
+                && (! isset($item['gate']) || $user->can('viewAny', KbArticle::class))));
         }
 
         return array_values(array_filter($sections, fn ($s) => $s['items'] !== []));

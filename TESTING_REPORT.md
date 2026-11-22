@@ -115,3 +115,10 @@ User (iPhone 13) membuka tiket: balasan & catatan penyelesaian terlihat, **teks 
   tidak ada notifikasi ganda saat Resolved dengan catatan, ambil sendiri tidak memberi notifikasi, buka notifikasi menandai dibaca
   & redirect sesuai role, notifikasi milik orang lain 404, tandai semua dibaca, komponen Livewire lonceng.
 - Browser (Playwright): scan QR di iPhone 13 → login → form unit DR → tiket; lonceng IT menampilkan "1 belum dibaca", update Livewire HTTP 200; tanpa error JS.
+
+## Phase 2 — Knowledge Base (2026-11-22)
+**Hasil: 188 test · 0 gagal** (12 test baru, `KnowledgeBaseTest`): CRUD + publish/archive + audit; slug unik & stabil; **user hanya
+melihat Published+Publik (internal/draft/arsip → 404)**; IT melihat semua; user tidak dapat menulis (403); pencarian gejala/tag/kategori;
+hitung tampilan; artikel terkait menghormati visibilitas; "jadikan artikel" tanpa catatan internal; pusat bantuan dapat dinonaktifkan;
+konten di-escape (XSS); subkategori harus sesuai kategori.
+Manual: jalur FULLTEXT pada DB dev — query memakai `MATCH`, artikel paling relevan di urutan pertama.

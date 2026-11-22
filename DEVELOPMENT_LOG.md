@@ -55,3 +55,11 @@ Catatan kronologis keputusan dan pekerjaan. Entri terbaru di bawah.
 - Temuan test: lonceng di layout memuat nomor tiket → test filter antrean diubah memeriksa data paginator.
 - Browser: alur scan QR → login → laporan (IT-DR-20261122-002), lonceng IT menampilkan notifikasi, request Livewire update HTTP 200.
 - Hasil: 176/176 test.
+
+## 2026-11-22 — Phase 2: Knowledge Base
+- Keputusan: kategori KB = tabel `categories` (tanpa `kb_categories`).
+- Pencarian: `MATCH ... AGAINST` (natural language, relevansi > 0) dengan fallback LIKE. Catatan: indeks FULLTEXT InnoDB baru
+  terisi setelah commit → test (RefreshDatabase/transaksi) menguji jalur LIKE; jalur FULLTEXT diverifikasi manual pada DB dev.
+- Temuan: kata umum ("tidak") memberi relevansi ~0 → ditambah syarat relevansi > 0; bug presedensi `??` pada select visibilitas form diperbaiki sebelum rilis.
+- Scope `KbArticle::readableBy()` menjadi satu-satunya pintu artikel untuk user & konteks AI.
+- Hasil: 188/188 test.
