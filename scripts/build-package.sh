@@ -30,7 +30,9 @@ echo "→ Mengekspor kode dari git (HEAD) ..."
 git -C "$ROOT" archive --format=tar HEAD | (mkdir -p "$STAGE" && tar -x -C "$STAGE")
 
 echo "→ composer install --no-dev ..."
-( cd "$STAGE" && COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --optimize-autoloader --no-interaction --no-progress --quiet )
+( cd "$STAGE" && COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction --no-progress --quiet )
+# Bila Composer terpaksa memasang dari source (git clone), buang metadata git agar paket tidak membengkak.
+find "$STAGE/vendor" -name .git -type d -prune -exec rm -rf {} +
 
 echo "→ Build asset (npm ci && npm run build) ..."
 ( cd "$STAGE" && npm ci --no-audit --no-fund --silent && npm run build --silent && rm -rf node_modules )

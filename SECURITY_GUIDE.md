@@ -1,46 +1,49 @@
-# SECURITY GUIDE — ALMEGA IT TICKETING SYSTEM
+# SECURITY GUIDE
 
-Status kontrol keamanan per item persyaratan. ✅ = terimplementasi & diuji · ⏳ = sprint berikutnya.
+✅ = terimplementasi & diuji. Detail pengujian: TESTING_REPORT.md.
 
-| # | Kontrol | Status | Implementasi |
-|---|---|---|---|
-| 1 | Password hashing | ✅ | bcrypt (cast `hashed` pada `User::password`, `BCRYPT_ROUNDS=12`). Password tidak pernah ditulis ke audit log. |
-| 2 | CSRF protection | ✅ | Middleware `web` bawaan Laravel; semua form memakai `@csrf`. |
-| 3 | XSS protection | ✅ | Output Blade `{{ }}` (escape otomatis). Tidak ada `{!! !!}` untuk input user. |
-| 4 | SQL injection | ✅ | Eloquent/Query Builder dengan parameter binding; filter divalidasi Form Request. |
-| 5 | Session security | ✅ | Driver database, regenerate ID saat login, invalidate saat logout, `http_only`, `same_site=lax`, `SESSION_SECURE_COOKIE=true` di production. Akun dinonaktifkan → sesi diputus pada request berikutnya (`EnsureUserIsActive`) dan baris sesi dihapus. Ganti password → sesi perangkat lain dihapus. Reset password admin → semua sesi user dihapus + remember token dirotasi. |
-| 6 | Rate limiting | ✅ | Login: 5 percobaan gagal per (username+IP) per 60 detik (`LoginRequest`), + 20 request/menit per IP (`throttle:login`). |
-| 7 | Authorization Policies | ✅ | Middleware `role:`, Gate `access-it`/`access-admin`, `UserPolicy`, `UnitPolicy`, `AuditLogPolicy`. Diuji dengan request langsung (bukan hanya menu). |
-| 8 | Validasi file upload | ✅ | Whitelist `mimes` + `mimetypes` (dideteksi dari **isi** file), tanpa SVG/HTML/PHP; ukuran & jumlah dari setting; nama simpan ULID acak, ekstensi dari MIME hasil deteksi; nama asli disanitasi. |
-| 9 | Private attachment storage | ✅ | `storage/app/private`, disk `serve => false`; unduh hanya lewat `AttachmentController` + `TicketAttachmentPolicy` (pemilik tiket / IT; lampiran INTERNAL hanya IT); header `nosniff`, `no-store`; non-gambar selalu `attachment`. |
-| 10 | Secure QR token | ✅ (token) / ⏳ S4 (alur) | 48 hex (192 bit) dari `random_bytes`, unik, dapat diregenerasi (audit `unit.qr_regenerated`), disembunyikan dari serialisasi model. QR tidak memberi akses tanpa login. |
-| 11 | HTTPS | ✅ | `URL::forceScheme('https')` di production, HSTS untuk request HTTPS, AutoSSL (lihat DEPLOYMENT). |
-| 12 | Audit logging | ✅ | `audit_logs` append-only (update/delete dilempar `LogicException`), tanpa route hapus. Mencatat user, aksi, entitas, IP, user agent, waktu. |
+## 1. Kontrol Wajib
+| # | Kontrol | Implementasi |
+|---|---|---|
+| 1 | Password hashing | bcrypt (`hashed` cast, 12 rounds); tidak pernah di audit log ✅ |
+| 2 | CSRF | Middleware `web`; semua form `@csrf`; request AJAX (AI) mengirim `X-CSRF-TOKEN` ✅ |
+| 3 | XSS | Blade `{{ }}`; Alpine `x-text`; `{!! !!}` hanya untuk SVG QR hasil library & 2 string statis; konten KB/tiket di-escape (diuji) ✅ |
+| 4 | SQL injection | Eloquent/binding; raw SQL hanya konstanta atau binding (pencarian KB) ✅ |
+| 5 | Session | Driver database, regenerate saat login, invalidate saat logout, `http_only`, `same_site=lax`, `secure` bila HTTPS; akun nonaktif → sesi diputus; ganti/reset password → sesi lain dihapus ✅ |
+| 6 | Rate limiting | Login 5/menit per akun+IP & 20/menit per IP; tiket & balasan 10/menit/user; QR 30/menit/IP; AI 20/menit + kuota per user/jam & harian; export 6/menit; laporan 10/menit ✅ |
+| 7 | Authorization | Middleware role, Gate, 6 Policy, scope visibilitas; **matriks akses otomatis seluruh rute GET** ✅ |
+| 8 | Validasi upload | `mimes` + `mimetypes` dari **isi** file (finfo); tanpa SVG/HTML/PHP; ukuran & jumlah dari setting; nama simpan ULID; ekstensi dari MIME ✅ |
+| 9 | Penyimpanan privat | `storage/app/private`, disk `serve=false`; unduh via Policy; lampiran INTERNAL hanya IT; `nosniff`, `no-store` ✅ |
+| 10 | Token QR | 192-bit `random_bytes`, unik, regenerasi (audit), tidak diserialisasi; QR tidak memberi akses data tanpa login ✅ |
+| 11 | HTTPS | `forceScheme('https')` bila production & `APP_URL` https; HSTS untuk request HTTPS; AutoSSL ✅ |
+| 12 | Audit logging | Append-only (model menolak update/delete), tanpa route hapus; user, aksi, entitas, IP, user agent, waktu ✅ |
 
-## Kontrol Tambahan
+## 2. Privasi Tiket & Catatan Internal
+- URL tiket = ULID; tiket orang lain → **404**; daftar/dashboard/pencarian di-scope ke pemilik.
+- Catatan internal, lampiran internal, dan riwayat internal **tidak pernah dimuat** untuk role USER; USER tidak dapat membuat catatan internal (dipaksa publik di server).
+- Catatan internal tidak memicu notifikasi ke pelapor, tidak masuk export/laporan, tidak dikirim ke AI untuk klasifikasi/troubleshooting/draf balasan.
 
-- **Privasi tiket**: URL memakai ULID `public_id`; tiket milik orang lain menghasilkan **404**; semua daftar di-scope `user_id`.
-- **Isolasi unit**: user hanya dapat melapor untuk unit aktif yang ditetapkan kepadanya (divalidasi di server).
-- **Anti-spam**: maksimal 10 tiket/menit per user (juga berlaku untuk balasan); export maks. 6/menit.
-- **Privasi catatan internal**: balasan, lampiran, dan entri riwayat INTERNAL tidak pernah dimuat untuk role USER (`visibleTo()`), USER tidak dapat membuat catatan internal (dipaksa PUBLIC di server), export tidak memuat percakapan.
-- **Status**: transisi divalidasi di server (`TicketStatusService`) dengan row lock; USER hanya dapat konfirmasi/buka kembali tiket miliknya yang Resolved.
+## 3. Keamanan AI
+Lihat AI_INTEGRATION_GUIDE.md §4: server-side saja, API key hanya `.env` (tidak di HTML/log), tanpa aksi otomatis, data diredaksi
+(nama pelapor, email, telepon, password/token), konten dibungkus sebagai data tak tepercaya (anti prompt injection), referensi KB
+divalidasi, hanya artikel Published yang boleh dibaca, log tanpa isi prompt, default nonaktif.
 
-- **Tanpa registrasi publik** — akun hanya dibuat IT Admin. Tidak ada endpoint reset via email.
-- **Password sementara** wajib diganti saat login pertama (`EnsurePasswordChanged`).
-- **Kebijakan password**: minimal 8 karakter, mengandung huruf dan angka.
-- **Anti-lockout admin**: IT Admin tidak dapat menurunkan role/menonaktifkan dirinya sendiri; IT Admin aktif terakhir tidak dapat dinonaktifkan.
-- **Security headers** (`SecurityHeaders`): `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `Referrer-Policy`, `Permissions-Policy`, HSTS.
-- **Pesan login generik** ("Username/email atau password salah") — tidak membocorkan keberadaan akun. Status nonaktif hanya diberitahukan setelah password benar.
-- **Data yang tidak dapat dihapus via UI**: unit, user (hanya nonaktif), audit log.
-- **Rahasia** hanya di `.env` (tidak di-commit; `.gitignore`). Password admin awal dari `.env`, bukan source code.
-- **Lazy-loading guard** aktif di non-production untuk mencegah N+1.
+## 4. Integritas Data
+- Penomoran tiket: increment atomik + UNIQUE constraint + retry; diuji 16 proses paralel (0 duplikat, 0 error).
+- **Formula injection spreadsheet** dicegah (`SafeRow`: teks selalu sel string).
+- Unit, user, kategori terpakai, audit log tidak dapat dihapus lewat UI.
 
-## Checklist Production
+## 5. Kontrol Tambahan
+Tanpa registrasi publik · password sementara wajib diganti · kebijakan password min. 8 huruf+angka · anti-lockout IT Admin ·
+security headers (`nosniff`, `SAMEORIGIN`, `Referrer-Policy`, `Permissions-Policy`, HSTS) · pesan login generik ·
+logo hanya PNG/JPG/WEBP · tautan kembali tidak memakai Referer eksternal · `preventLazyLoading` di non-production.
 
-- [ ] `APP_ENV=production`, `APP_DEBUG=false`
-- [ ] `APP_KEY` unik, tersimpan aman
-- [ ] `SESSION_SECURE_COOKIE=true`, HTTPS aktif
-- [ ] `.env` di luar web root, permission 600; `https://it.almegajaya.com/.env` → 403/404
-- [ ] Password IT Admin awal sudah diganti; `INITIAL_ADMIN_PASSWORD` dikosongkan dari `.env` setelah seed
-- [ ] `DemoSeeder` tidak dijalankan
-- [ ] Backup terjadwal & diuji restore
+## 6. Checklist Production
+- [ ] `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://…`
+- [ ] `APP_KEY` unik & tersimpan aman (dibutuhkan saat restore)
+- [ ] `SESSION_SECURE_COOKIE=true`, AutoSSL aktif
+- [ ] `.env` di luar web root, permission 600; `/.env` → 403/404
+- [ ] Password IT Admin awal diganti; `INITIAL_ADMIN_PASSWORD` dikosongkan
+- [ ] `DemoSeeder`/`DemoTicketSeeder` tidak dijalankan
+- [ ] AI: hanya diaktifkan setelah menyetujui kebijakan data provider; `AI_DAILY_LIMIT` sesuai anggaran
+- [ ] Backup terjadwal & uji restore

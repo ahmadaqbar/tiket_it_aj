@@ -1,4 +1,22 @@
-# TESTING REPORT — ALMEGA IT TICKETING SYSTEM
+# TESTING REPORT — AI IT Ticketing & Helpdesk Kit
+
+## Ringkasan Akhir (1.0.0-rc.1, 2026-11-22)
+
+| Item | Hasil |
+|---|---|
+| Automated test | **255 test · 1.054 assertion · 0 gagal** (PHPUnit 12, MariaDB 10.11) |
+| Panggilan API AI berbayar dalam test | Tidak ada (FakeAiProvider, `Http::fake`, stub lokal) |
+| Audit dependensi | composer audit & npm audit: 0 kerentanan |
+| Uji konkurensi penomoran | 16 proses × 25 tiket paralel: 400/400 sukses, 0 duplikat |
+| Uji performa | Antrean/dashboard ≤ 63 ms, analytics ≤ 114 ms (±5.800 tiket) |
+| Backup/restore | Semua tabel identik setelah restore |
+| Instalasi bersih dari paket | Berhasil (edisi produk, APP_ENV=production) |
+| Bug ditemukan & diperbaiki selama pengembangan lanjutan | BUG-01 audit palsu, redaksi AI (2 pola), SEC-01 formula injection Excel, CON-01 deadlock penomoran, SEC-02 Referer, forceScheme tanpa SSL, paket membengkak |
+
+Riwayat rinci per fase di bawah.
+
+---
+
 
 ## Sprint 1 — Foundation (2026-11-14)
 
@@ -201,3 +219,11 @@ ticket_replies, ticket_histories, kb_articles, audit_logs, settings, notificatio
 - Uji di shared hosting aktual (spesifikasi belum tersedia) — Phase 10 menyiapkan paket & checklist.
 - Uji beban HTTP konkuren (banyak user membuka halaman bersamaan) belum dilakukan; konkurensi tulis yang kritis (penomoran) sudah diuji.
 - Panggilan ke API AI sungguhan (berbayar) tidak dilakukan; diganti Fake provider, `Http::fake`, dan stub lokal berformat Anthropic.
+
+## Phase 10 — Persiapan Shared Hosting (2026-11-22)
+- `scripts/build-package.sh` untuk `product` dan `almega`: zip ±48 MB, tanpa `.env`, tanpa `tests/`, tanpa dependensi dev, `public/build/` ada, `HELPDESK_EDITION` sesuai.
+- **Instalasi bersih dari paket** (direktori & DB baru, `APP_ENV=production`): `key:generate`, `migrate --seed` (unit `HQ`, 8 kategori, admin wajib ganti
+  password), `config:cache`/`route:cache`/`view:cache` sukses, scheduler terdaftar, `/.env` 404, `/up` 200.
+- Browser (Playwright) pada paket terpasang: admin ganti password → rebranding → buat user → user (iPhone 13) ganti password → buat tiket
+  `IT-HQ-20261122-001` → tampil di antrean IT. Tanpa error JavaScript.
+- Belum dilakukan: deployment ke hosting aktual (menunggu persetujuan & spesifikasi hosting).

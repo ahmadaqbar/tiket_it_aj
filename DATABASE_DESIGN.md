@@ -256,3 +256,28 @@ author_id FK, updated_by FK NULL, source_ticket_id FK NULL → tickets, view_cou
 Index: (status, visibility), FULLTEXT `kb_articles_fulltext`.
 `kb_tags`: id, name, slug UNIQUE. `kb_article_tag`: (kb_article_id, kb_tag_id) PK.
 Kategori KB = kategori tiket (keputusan: hindari tabel duplikat, relevansi tiket↔artikel).
+
+## 8. Tabel Tambahan Phase 1d–7
+
+| Tabel | Isi |
+|---|---|
+| `notifications` | Notifikasi in-app (Laravel, channel database). `data` JSON: event, ticket_public_id, ticket_number, title, message, actor |
+| `ai_requests` | Log penggunaan AI **tanpa isi prompt/jawaban**: user_id, ticket_id, feature, provider, model, status (`success`/`error`/`disabled`/`rate_limited`/`invalid_response`), input_tokens, output_tokens, duration_ms, error_code, created_at |
+
+## 9. Kunci `settings`
+
+| Key | Tipe | Default | Diubah di |
+|---|---|---|---|
+| `branding.app_name`, `branding.short_name`, `branding.primary_color`, `branding.logo_path` | string | dari edisi | System Settings |
+| `organization.name`, `organization.support_team` | string | dari edisi | System Settings |
+| `contact.email`, `contact.phone`, `contact.address` | string | kosong | System Settings |
+| `ticket.number_prefix` | string | `IT` | System Settings |
+| `ticket.auto_close_days` | int | 3 | System Settings |
+| `upload.max_kb`, `upload.max_files` | int | 5120, 5 | System Settings |
+| `kb.public_enabled` | bool | 1 | System Settings |
+| `ai.enabled` | bool | 0 | System Settings |
+
+## 10. Penomoran Tiket (revisi Phase 9)
+Algoritma §4 diganti: `INSERT … ON DUPLICATE KEY UPDATE last_number = last_number + 1` (exclusive lock langsung) lalu baca
+`last_number` di transaksi yang sama, dengan retry transaksi 3×. Pola lama (INSERT IGNORE + SELECT FOR UPDATE) menimbulkan deadlock
+saat laporan bersamaan. Format & keunikan tidak berubah.

@@ -36,12 +36,12 @@ Metode: incremental, satu sprint per commit, setiap sprint diuji sebelum dinyata
 |---|---|---|
 | **1 — Foundation** | Setup Laravel, konfigurasi DB, autentikasi (login username/email, logout, rate limit, ganti password, profil), role (USER/IT/IT_ADMIN) + middleware + Gate + Policy, master unit (15 unit via seeder), manajemen user (multi-unit), audit log (login/logout/user/unit), layout responsif per role, settings | ✅ Selesai — lihat `TESTING_REPORT.md` |
 | 2 — Core Ticketing | Kategori/subkategori (seeder + CRUD admin), SLA policy, penomoran tiket (transaction + row lock), form buat laporan (1 halaman), attachment private, Tiket Saya, detail tiket, dashboard user | ✅ Selesai 2026-11-22 (Phase 1b) |
-| 3 — IT Management | Shared queue + filter/sort/search/pagination, balasan publik, internal note, quick reply, status management + reopen/konfirmasi, assignment PIC, history | ⏳ |
-| 4 — QR & Notification | QR per unit (PNG/PDF/print/regenerate), `/qr/{token}` → login → unit terisi, database notification + polling, manifest PWA | ⏳ |
-| 5 — Analytics | Dashboard IT (summary + 9 chart), filter periode, SLA metrics, recurring issues | ⏳ |
-| 6 — Reporting | Operational & Management report (PDF + Excel), filter tanggal/unit, laporan bulanan | ⏳ |
-| 7 — QA & Security | Test menyeluruh, security review, performance, uji backup/restore | ⏳ |
-| 8 — Deployment | Persiapan hosting, domain, SSL, DB production, cron, smoke test (**hanya dengan persetujuan eksplisit**) | ⏳ |
+| 3 — IT Management | Shared queue + filter/sort/search/pagination, balasan publik, internal note, quick reply, status management + reopen/konfirmasi, assignment PIC, history | ✅ (Phase 1c) |
+| 4 — QR & Notification | QR per unit (PNG/PDF/print/regenerate), `/qr/{token}` → login → unit terisi, database notification + polling, manifest PWA | ✅ (Phase 1d) |
+| 5 — Analytics | Dashboard IT (summary + 9 chart), filter periode, SLA metrics, recurring issues | ✅ (Phase 7) |
+| 6 — Reporting | Operational & Management report (PDF + Excel), filter tanggal/unit, laporan bulanan | ✅ (Phase 7) |
+| 7 — QA & Security | Test menyeluruh, security review, performance, uji backup/restore | ✅ (Phase 9) |
+| 8 — Deployment | Persiapan hosting, domain, SSL, DB production, cron, smoke test (**hanya dengan persetujuan eksplisit**) | 🟡 Paket & dokumen siap (Phase 10); deploy menunggu persetujuan |
 
 ## 3. Prinsip Implementasi
 

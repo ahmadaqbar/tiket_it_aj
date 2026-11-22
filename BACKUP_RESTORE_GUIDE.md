@@ -5,7 +5,7 @@
 | Komponen | Lokasi | Frekuensi |
 |---|---|---|
 | Database MySQL | `almega_it_ticketing` (nama DB cPanel) | Harian + sebelum setiap update |
-| Lampiran tiket (mulai Sprint 2) | `almega-it/storage/app/private/` | Harian (inkremental) |
+| Lampiran tiket & logo branding | `almega-it/storage/app/private/` (`attachments/`, `branding/`) | Harian (inkremental) |
 | File `.env` | `almega-it/.env` | Setiap kali diubah — simpan **terpisah & terenkripsi** (berisi APP_KEY & password DB) |
 
 Kode aplikasi tidak perlu di-backup harian karena tersimpan di Git.
@@ -20,7 +20,7 @@ Retensi yang disarankan: 7 harian, 4 mingguan, 12 bulanan. Simpan minimal satu s
 - phpMyAdmin → pilih DB → **Export** → Custom → format SQL, compression gzip.
 
 ### 2.2 Via SSH / Cron (otomatis)
-Perintah (sudah diuji pada MariaDB 10.11 — dump → restore menghasilkan jumlah baris identik):
+Perintah (diuji pada MariaDB 10.11 dengan skema lengkap & ±5.800 tiket — dump → restore menghasilkan jumlah baris identik di semua tabel, index FULLTEXT ikut ter-restore):
 ```bash
 mysqldump -u DB_USER -p'DB_PASS' --no-tablespaces --single-transaction --routines \
   --default-character-set=utf8mb4 DB_NAME | gzip > ~/backups/almega-db-$(date +\%F).sql.gz

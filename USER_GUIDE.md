@@ -1,65 +1,47 @@
-# PANDUAN PENGGUNA (Role: User) — ALMEGA IT TICKETING SYSTEM
+# PANDUAN PENGGUNA (Role: User)
 
-Alamat: **https://it.almegajaya.com** — dapat dibuka dari HP maupun komputer.
+Buka alamat helpdesk organisasi Anda (Edisi Almega: **https://it.almegajaya.com**) dari HP atau komputer.
 
-> Panduan ini mengikuti fitur yang sudah tersedia. Bagian bertanda ⏳ akan aktif pada rilis berikutnya.
+## 1. Akun & Login
+- Akun dibuat oleh IT Admin; tidak ada pendaftaran mandiri. Login dengan **username atau email**.
+- Login pertama: **wajib mengganti password sementara** (min. 8 karakter, huruf + angka).
+- 5× salah password → dikunci ±1 menit. Lupa password → hubungi IT Admin.
+- Pasang ke layar utama HP: menu browser → *Tambahkan ke Layar Utama* (PWA).
 
-## 1. Mendapatkan Akun
-Akun dibuat oleh **IT Admin**. Anda akan menerima **username** dan **password sementara**.
-Tidak ada pendaftaran mandiri.
+## 2. Dashboard
+Salam, unit Anda, tombol **Buat Laporan**, jumlah tiket (total, baru, dalam proses, selesai), 5 tiket terbaru, dan kontak Tim IT.
+Di HP, menu ada di bawah layar; menu lengkap lewat ☰.
 
-## 2. Masuk (Login)
-1. Buka https://it.almegajaya.com
-2. Isi **Username / Email** dan **Password**, lalu tekan **Masuk**.
-3. Saat login pertama, Anda **wajib mengganti password sementara**:
-   minimal 8 karakter, berisi huruf dan angka, berbeda dari password lama.
-4. Centang "Ingat saya" hanya di perangkat pribadi.
+## 3. Buat Laporan
+1. **Buat Laporan** — atau **scan QR Code** yang ditempel di unit (setelah login, unit langsung terisi).
+2. Isi **Judul**, pilih **Kategori** (subkategori opsional), tulis **Deskripsi**.
+3. Prioritas opsional (default Sedang): Rendah · Sedang · Tinggi · Mendesak.
+4. Lampiran opsional: foto (JPG/PNG/WEBP), PDF, Word, Excel, TXT (batas tampil di form).
+5. **Kirim Laporan** → nomor tiket tampil, mis. `IT-DR-20261122-001`.
 
-Jika salah password 5 kali, login dikunci sementara ±1 menit.
-Lupa password → hubungi IT Admin untuk reset.
-
-## 3. Dashboard
-Menampilkan salam, unit Anda, tombol **Buat Laporan**, ringkasan jumlah tiket (total, baru, dalam proses, selesai),
-dan 5 tiket terbaru.
-
-Menu di HP ada di bagian bawah layar; menu lengkap dapat dibuka lewat tombol ☰ di kiri atas.
-
-## 4. Profil
-Menu **Profil** → ubah nama, email, dan nomor HP. Username, role, dan unit hanya dapat diubah oleh IT Admin.
-Tombol **Ganti Password** tersedia di halaman profil. Setelah mengganti password, sesi di perangkat lain otomatis keluar.
-
-## 5. Keluar
-Tekan **Keluar** di menu (☰ pada HP).
-
-## 6. Buat Laporan
-1. Tekan **Buat Laporan**.
-2. Unit terisi otomatis (pilih bila Anda terdaftar di beberapa unit).
-3. Isi **Judul**, pilih **Kategori** (subkategori opsional), tulis **Deskripsi** kendala.
-4. Prioritas opsional (default **Sedang**): Rendah · Sedang · Tinggi · Mendesak.
-5. Lampiran opsional: foto (JPG/PNG/WEBP), PDF, Word, Excel, TXT. Batas jumlah & ukuran tampil di form.
-6. Tekan **Kirim Laporan** → nomor tiket tampil, mis. `IT-DR-20261122-001`.
-
-## 7. Tiket Saya & Riwayat
-- **Tiket Saya**: tiket yang belum ditutup. Cari berdasarkan nomor/judul, filter status.
-- **Riwayat**: tiket yang sudah **Closed**.
-- Buka tiket untuk melihat detail, lampiran, dan riwayat aktivitas. Anda hanya dapat melihat tiket milik sendiri.
+## 4. Tiket Saya & Riwayat
+- **Tiket Saya**: tiket yang belum ditutup. **Riwayat**: tiket Closed. Cari nomor/judul, filter status.
+- Anda hanya dapat melihat tiket milik sendiri.
 
 | Status | Arti |
 |---|---|
-| Baru | Laporan masuk, belum ditangani |
-| Dalam Proses | IT sedang menangani |
+| Baru | Laporan masuk |
+| Dalam Proses | Sedang ditangani IT |
 | Pending | Menunggu informasi/tindakan pihak lain |
-| Resolved | IT menyatakan sudah selesai |
+| Resolved | IT menyatakan sudah selesai — mohon konfirmasi |
 | Closed | Tiket ditutup |
 
-## 8. Membalas & Menyelesaikan Tiket
-- Di halaman tiket, bagian **Percakapan** menampilkan balasan dari Tim IT. Tulis pesan (bisa dengan foto/dokumen) lalu **Kirim Balasan**.
-- Saat tiket berstatus **Resolved**, muncul pertanyaan *"Apakah kendala sudah benar-benar selesai?"*:
-  - **Ya, sudah selesai** → tiket ditutup (Closed).
-  - **Belum, buka kembali** → tulis apa yang masih bermasalah; tiket kembali ke Tim IT.
-- Bila tidak dikonfirmasi dalam beberapa hari (default 3), tiket ditutup otomatis.
-- Tiket Closed tidak dapat dibalas. Buat laporan baru bila kendala muncul lagi.
+## 5. Percakapan & Penyelesaian
+- Balas pesan Tim IT (bisa dengan foto/dokumen) di bagian **Percakapan**.
+- Saat **Resolved**: pilih **Ya, sudah selesai** (tiket ditutup) atau **Belum, buka kembali** (tulis yang masih bermasalah).
+- Tanpa konfirmasi, tiket ditutup otomatis setelah beberapa hari (default 3).
+- Tiket Closed tidak dapat dibalas; buat laporan baru bila kendala muncul lagi.
 
-## 9. ⏳ Fitur Berikutnya
-- Scan QR Code unit untuk membuat laporan lebih cepat
-- Notifikasi dalam aplikasi
+## 6. Notifikasi
+Ikon lonceng (kanan atas) menampilkan balasan IT, perubahan status, dan penyelesaian. Klik untuk membuka tiket.
+
+## 7. Pusat Bantuan
+Menu **Bantuan** berisi panduan mengatasi kendala umum (bila diaktifkan IT Admin). Coba cari solusinya sebelum membuat laporan.
+
+## 8. Profil
+Ubah nama, email, nomor HP, dan password. Username, role, dan unit diatur IT Admin.

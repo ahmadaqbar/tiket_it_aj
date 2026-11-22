@@ -76,6 +76,7 @@ class SettingsController extends Controller
             'templates' => QuickReplyTemplate::orderBy('sort_order')->orderBy('id')->get(),
             'system' => [
                 'edition' => config('helpdesk.edition'),
+                'version' => trim((string) @file_get_contents(base_path('VERSION'))) ?: '-',
                 'timezone' => config('app.timezone'),
                 'php' => PHP_VERSION,
                 'laravel' => app()->version(),

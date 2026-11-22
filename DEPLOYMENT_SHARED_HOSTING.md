@@ -37,6 +37,10 @@ Jika subdomain terkunci ke `/home/<user>/public_html/it` (contoh):
 
 ## 4. Persiapan Paket (di komputer lokal / Windows)
 
+**Cara disarankan:** `bash scripts/build-package.sh almega` (Git Bash/WSL) → `dist/almega-it-ticketing-<versi>.zip` siap upload
+(kode + `vendor/` tanpa dev + `public/build/`, tanpa `.env`/tests/node_modules) beserta `.sha256`. Diuji: instalasi bersih dari paket
+(migrate, seed, config/route/view cache, alur login→laporan→antrean) berhasil. Cara manual:
+
 ```bash
 composer install --no-dev --optimize-autoloader
 npm ci
@@ -79,7 +83,7 @@ almega-it/storage            755 (folder) / 644 (file) — harus writable oleh P
 almega-it/bootstrap/cache    755
 almega-it/.env               600
 ```
-Attachment disimpan di `storage/app/private` (bukan `public`) sehingga **tidak perlu** `storage:link`.
+Lampiran dan logo disimpan di `storage/app/private` (bukan `public`) sehingga **tidak perlu** `storage:link`.
 
 ## 7. Optimasi (setelah `.env` final)
 
@@ -108,15 +112,16 @@ Scheduler menjalankan (lihat `routes/console.php`):
 | tiap menit | `queue:work --stop-when-empty --max-time=50` | Memproses antrean database lalu berhenti (tanpa worker permanen) |
 | harian | `queue:prune-failed --hours=720` | Membersihkan job gagal > 30 hari |
 | tiap jam | `tickets:auto-close` | Menutup tiket Resolved yang tidak dikonfirmasi dalam `ticket.auto_close_days` hari |
-| (Phase 1d) | notifikasi | ditambahkan saat modul tersedia |
+| — | notifikasi | Tidak butuh cron (dikirim sinkron ke database) |
 
 **Jika Cron tidak tersedia:** fitur inti (login, tiket, balasan, notifikasi in-app) tetap berjalan karena tidak bergantung pada antrean.
-Tugas terjadwal (auto-close tiket) akan disediakan sebagai tombol **"Jalankan Tugas Terjadwal"** di halaman IT Admin (Sprint 4) — dijalankan manual oleh admin, tidak dipicu oleh request user biasa.
+Tugas terjadwal (auto-close tiket) dijalankan manual lewat tombol **System Settings → Jalankan Tugas Terjadwal Sekarang** (khusus IT Admin, diaudit) — tidak dipicu oleh request user biasa.
 
 ## 9. SSL / HTTPS
 
 1. cPanel → **SSL/TLS Status** → jalankan **AutoSSL** untuk `it.almegajaya.com`.
-2. Aplikasi memaksa skema `https` di production (`URL::forceScheme`) dan mengirim header HSTS untuk request HTTPS.
+2. Aplikasi memaksa skema `https` bila `APP_ENV=production` **dan** `APP_URL` diawali `https://`, serta mengirim header HSTS untuk request HTTPS.
+   (Selama SSL belum aktif, isi `APP_URL=http://…` agar form tetap berfungsi; ubah ke https setelah AutoSSL aktif lalu `config:cache`.)
 3. Opsional, redirect HTTP→HTTPS di `public/.htaccess` (setelah SSL aktif):
    ```apache
    RewriteCond %{HTTPS} off
@@ -147,6 +152,9 @@ memory_limit = 256M
 - [ ] AutoSSL aktif, HTTPS berfungsi
 - [ ] Smoke test (§12)
 - [ ] Ganti password IT Admin awal
+- [ ] System Settings: periksa branding, kontak, prefix `IT` (Edisi Almega)
+- [ ] QR Management: unduh PDF semua unit, cetak, tempel
+- [ ] (Opsional) AI: isi `AI_*` di `.env`, `config:cache`, aktifkan di System Settings
 
 ## 12. Smoke Test Setelah Deploy
 
@@ -167,6 +175,14 @@ memory_limit = 256M
 5. `php artisan up`
 
 ## 14. Troubleshooting
+
+| Gejala | Penyebab umum | Solusi |
+|---|---|---|
+| Grafik Analytics kosong | `public/build/` lama (tanpa `charts-*.js`) | Upload ulang `public/build/` dari paket |
+| Asisten AI "tidak aktif" | Setting AI mati / `AI_API_KEY` kosong / config ter-cache | Lihat alasan di System Settings; `config:cache` setelah ubah `.env` |
+| Asisten AI "tidak dapat terhubung" | Hosting memblokir HTTPS keluar | Minta penyedia hosting membuka akses ke host provider AI |
+| Laporan PDF timeout | Periode terlalu panjang | Persempit periode atau gunakan Excel |
+
 
 | Gejala | Penyebab umum | Solusi |
 |---|---|---|

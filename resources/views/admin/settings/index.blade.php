@@ -105,6 +105,7 @@
     <section class="card mt-6 p-5 sm:p-6">
         <h2 class="text-base font-semibold text-gray-900">Sistem</h2>
         <dl class="mt-3 grid gap-x-6 gap-y-1 text-sm sm:grid-cols-2">
+            <div class="flex justify-between"><dt class="text-gray-500">Versi</dt><dd>{{ $system['version'] }}</dd></div>
             <div class="flex justify-between"><dt class="text-gray-500">Edisi</dt><dd>{{ $system['edition'] === 'almega' ? 'Almega Internal' : 'Produk' }}</dd></div>
             <div class="flex justify-between"><dt class="text-gray-500">Timezone (.env APP_TIMEZONE)</dt><dd>{{ $system['timezone'] }}</dd></div>
             <div class="flex justify-between"><dt class="text-gray-500">PHP</dt><dd>{{ $system['php'] }}</dd></div>

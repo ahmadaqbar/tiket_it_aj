@@ -96,3 +96,11 @@ Catatan kronologis keputusan dan pekerjaan. Entri terbaru di bawah.
 - Batas PDF operasional diturunkan 1.000 → 500 baris setelah uji performa.
 - `AccessMatrixTest` menelusuri seluruh rute GET — rute baru otomatis ikut diuji otorisasinya.
 - Hasil: 255/255 test.
+
+## 2026-11-22 — Phase 8 & 10: Productization & Persiapan Hosting
+- Script paket diuji untuk dua edisi. Temuan: lingkungan tanpa unduhan dist GitHub membuat Composer memasang dari source → 88 folder `.git`
+  di vendor (paket 429 MB) → dibersihkan otomatis (48 MB).
+- **Instalasi bersih dari paket produk** di direktori & database baru (APP_ENV=production): migrate+seed, config/route/view cache,
+  login admin → ganti password → rebranding → buat user → user (HP) membuat tiket `IT-HQ-…-001` → muncul di antrean. `/.env` 404, `/up` 200.
+- Temuan: `forceScheme('https')` tanpa syarat merusak form bila SSL belum aktif → kini hanya bila `APP_URL` https.
+- Deployment production **tidak dilakukan** (menunggu persetujuan eksplisit & data hosting).

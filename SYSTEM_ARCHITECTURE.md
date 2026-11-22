@@ -1,83 +1,61 @@
-# SYSTEM ARCHITECTURE — ALMEGA IT TICKETING SYSTEM
+# SYSTEM ARCHITECTURE
 
-## 1. Gaya Arsitektur
-
-**Modular monolith** Laravel, satu aplikasi dan satu database, dirancang untuk **shared hosting**:
-tidak ada proses permanen, semua state di MySQL, dan pekerjaan terjadwal lewat satu Cron Job.
+## 1. Gaya
+**Modular monolith** Laravel 13, satu database MySQL, dirancang untuk **shared hosting**: tanpa proses permanen,
+semua state di database, pekerjaan terjadwal lewat satu Cron (`schedule:run`), notifikasi via polling ringan.
 
 ```
-Browser (HP / Desktop)
-   │  HTTPS
-   ▼
-public/index.php ── Middleware web ── Route ── Controller / Livewire
-                    (session, CSRF,           │
-                     SecurityHeaders,         ├─ Form Request (validasi + authorize)
-                     auth, active,            ├─ Policy / Gate (otorisasi)
-                     password.changed,        └─ Service Layer (business logic, DB::transaction)
-                     role:…)                          │
-                                                      ├─ Eloquent Models ── MySQL (InnoDB, utf8mb4)
-                                                      └─ AuditService ──── audit_logs (append-only)
-Cron (tiap menit) ── artisan schedule:run ── queue:work --stop-when-empty (antrean database)
+Browser (HP/Desktop, PWA)
+  │ HTTPS
+public/index.php → Middleware (session, CSRF, SecurityHeaders, auth, active, password.changed, role:…, throttle)
+  → Controller / Livewire (NotificationBell)
+      ├─ Form Request (validasi + authorize → Policy)
+      └─ Service Layer (DB::transaction, AuditService, NotificationService)
+            ├─ Eloquent → MySQL (InnoDB, utf8mb4, FULLTEXT KB)
+            ├─ storage/app/private (lampiran, logo) — diunduh via controller + Policy
+            └─ AiGateway → AiProvider (HTTPS keluar, opsional)
+Cron tiap menit → schedule:run → queue:work --stop-when-empty · tickets:auto-close (tiap jam) · queue:prune-failed
 ```
 
-## 2. Lapisan
-
-| Lapisan | Lokasi | Tanggung jawab |
-|---|---|---|
-| Routing | `routes/web.php` | Grup per role: `user.*`, `it.*`, `admin.*` |
-| Middleware | `app/Http/Middleware` | `EnsureRole` (`role:`), `EnsureUserIsActive` (`active`), `EnsurePasswordChanged` (`password.changed`), `SecurityHeaders` |
-| Validasi | `app/Http/Requests` | Form Request untuk setiap input; pesan Bahasa Indonesia (`lang/id`) |
-| Otorisasi | `app/Policies`, Gate di `AppServiceProvider` | `UserPolicy`, `UnitPolicy`, `AuditLogPolicy`, `TicketPolicy`, `TicketAttachmentPolicy`; Gate `access-it`, `access-admin` |
-| Business logic | `app/Services` | `UserService`, `UnitService`, `AuditService`, `SettingService`, `TicketService`, `TicketNumberService`, `AttachmentService`, `CategoryService` (+ Analytics/Report/KB/AI di fase berikutnya) |
-| Model | `app/Models` | `Role`, `Unit`, `User`, `AuditLog` (append-only), `Setting` |
-| Enum | `app/Enums` | `RoleCode`, `TicketStatus`, `TicketPriority`, `TicketSource` (label, warna badge, bobot) |
-| Navigasi | `app/Support/Navigation` | Menu per role; item muncul otomatis saat route modul tersedia |
-| View | `resources/views` | `layouts/` (app, guest), `components/`, `auth/`, `user/`, `it/`, `admin/`, `errors/` |
+## 2. Modul
+| Modul | Komponen utama |
+|---|---|
+| Auth & akses | LoginController, PasswordController, ProfileController; middleware `role`, `active`, `password.changed`; Gate `access-it`/`access-admin` |
+| Master data | UserService, UnitService, CategoryService, SlaPolicyController, QuickReplyTemplateController |
+| Tiket | TicketService (buat, klasifikasi ulang), TicketNumberService (increment atomik), AttachmentService, TicketReplyService, TicketStatusService, TicketAssignmentService, TicketExportService |
+| Otorisasi tiket | TicketPolicy, TicketAttachmentPolicy, scope `TicketReply::visibleTo`, `TicketHistory::visibleTo` |
+| QR | QrCodeService, QrController (publik), Admin\QrCodeController |
+| Notifikasi | NotificationService, TicketActivity (database), Livewire NotificationBell |
+| Knowledge Base | KnowledgeBaseService (FULLTEXT + LIKE, related), KbArticlePolicy, scope `KbArticle::readableBy` |
+| AI | AiManager, AiGateway, AiProvider (Anthropic / OpenAI-compatible / Fake), AiContextBuilder, AiJson, TicketAiService, KnowledgeBaseAiService |
+| Analytics & laporan | AnalyticsService, ReportPeriod, ReportService (dompdf, openspout + SafeRow) |
+| Konfigurasi produk | SettingService (tabel `settings`), Branding, config/helpdesk.php (edisi), SettingsController |
+| Audit | AuditService, AuditLog (append-only) |
 
 ## 3. Otorisasi Berlapis
+1. Route middleware (`role:IT_ADMIN` dsb.) → 403.
+2. Form Request `authorize()` → Policy.
+3. Controller `authorize()` / `abort_unless(can(...), 404)` untuk data milik orang lain (tidak membocorkan keberadaan).
+4. Scope query (`ownedBy`, `visibleTo`, `readableBy`) — data internal tidak pernah dimuat untuk role USER.
+5. Aturan bisnis di service (transisi status, visibilitas balasan, anti-lockout admin).
+6. `AccessMatrixTest` menguji seluruh rute GET secara otomatis.
 
-1. **Route middleware** `role:IT_ADMIN` dsb. — request dari role yang salah langsung 403.
-2. **Form Request `authorize()`** memanggil Policy (`can('update', $user)`).
-3. **Controller `authorize()`** untuk aksi baca (index/edit).
-4. **Service guard** untuk aturan bisnis (mis. admin tidak bisa menonaktifkan dirinya / admin aktif terakhir).
-5. Menu yang disembunyikan di UI hanyalah pelengkap, bukan pengaman.
-
-## 4. Konvensi Penting
-
-- `User::$with = ['role']` — role selalu tersedia untuk otorisasi tanpa query tambahan per pemeriksaan.
-- `Model::preventLazyLoading()` aktif di luar production untuk mendeteksi N+1 sejak dini.
-- Layout dipakai sebagai anonymous component: `<x-layouts::app title="...">`.
-- Timezone aplikasi dari `APP_TIMEZONE` (default `Asia/Jakarta`; `Asia/Makassar` untuk WITA).
-- Seluruh driver (session, cache, queue) = `database`.
+## 4. Konfigurasi
+1. Tabel `settings` (System Settings, UI) → 2. `config/helpdesk.php` & `config/ai.php` (.env) → 3. default kode = nilai Almega.
+Rahasia (DB, APP_KEY, AI_API_KEY) hanya di `.env`. Timezone di `.env` (tidak diubah via UI karena memengaruhi data lama).
 
 ## 5. Keputusan Teknis (ADR ringkas)
-
 | Keputusan | Alasan |
 |---|---|
-| Login memakai username (email opsional) | Staf unit tidak semua memiliki email |
-| `user_units` many-to-many + `is_primary` | Staf dapat menangani lebih dari satu unit; unit utama dipakai sebagai default form |
-| Controller + Form Request untuk CRUD admin; Livewire untuk bagian interaktif (sprint berikutnya) | CRUD tetap berfungsi tanpa JS dan mudah diuji; Livewire dipakai di form tiket, antrean, dan notifikasi |
-| Audit log append-only di level model | Mencegah perubahan/hapus walau ada bug di controller |
-| Sesi diputus dengan menghapus baris `sessions` | `Auth::logoutOtherDevices` membutuhkan middleware `AuthenticateSession`; penghapusan langsung lebih pasti pada driver database |
-| Form Buat Laporan = Blade + Alpine, bukan Livewire upload | Upload langsung multipart tanpa endpoint temporary Livewire; tetap berfungsi pada shared hosting dengan batas upload kecil |
-| Tiket di URL memakai ULID `public_id`; akses tidak sah → 404 | Tidak dapat ditebak dan tidak membocorkan keberadaan tiket |
-| Tidak memakai Laravel Breeze/Jetstream | Menghindari fitur registrasi publik / reset email yang tidak diminta |
-
-## 6. Struktur Folder (Sprint 1)
-
-```
-app/
-├── Enums/RoleCode.php
-├── Http/Controllers/{Auth,Admin,User,It}/
-├── Http/Middleware/
-├── Http/Requests/{Auth,Admin}/
-├── Models/
-├── Policies/
-├── Services/
-└── Support/Navigation.php
-config/almega.php
-database/{migrations,seeders,factories}/
-lang/id/
-resources/views/{layouts,components,auth,user,it,admin,errors}/
-tests/{Feature,Unit}/
-```
+| Login username (email opsional) | Staf unit tidak semua punya email |
+| `user_units` many-to-many + unit utama | Staf dapat menangani beberapa unit |
+| CRUD admin: controller + Form Request; Livewire hanya untuk lonceng polling | Berfungsi tanpa JS, mudah diuji, minim state server |
+| Form laporan & balasan: Blade + Alpine (multipart biasa) | Upload tanpa endpoint temporary; cocok batas upload hosting |
+| Tiket di URL = ULID; akses tidak sah → 404 | Tidak dapat ditebak & tidak membocorkan keberadaan |
+| Nomor tiket: `INSERT … ON DUPLICATE KEY UPDATE` + retry | Bebas deadlock pada laporan bersamaan (uji 16 proses paralel) |
+| Notifikasi database sinkron + polling | Tanpa worker/WebSocket |
+| Kategori KB = kategori tiket | Tanpa tabel duplikat; relevansi tiket↔artikel |
+| AI via endpoint JSON + Alpine, provider abstraction | Mudah diuji (Fake), tidak terkunci satu vendor, AI opsional |
+| Spreadsheet: semua teks sebagai StringCell (`SafeRow`) | Mencegah formula injection |
+| Logo di storage privat + route | Tanpa `storage:link` (symlink sering diblokir hosting) |
+| Warna tema = override CSS variable Tailwind v4 | Rebranding tanpa build ulang |

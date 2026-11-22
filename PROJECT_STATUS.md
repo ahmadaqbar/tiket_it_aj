@@ -1,33 +1,37 @@
 # PROJECT STATUS
 
-Terakhir diperbarui: 2026-11-22 (setelah Phase 1c). Legenda: ✅ selesai & teruji · 🟡 sebagian · ⏳ belum · ❌ rusak.
+Terakhir diperbarui: 2026-11-22 · Versi **1.0.0-rc.1** · Branch `claude/ecstatic-bardeen-25yzgc`
+Legenda: ✅ selesai & teruji · 🟡 sebagian · ⏳ belum.
 
+## Ringkasan
+Seluruh fase pengembangan (0–10) selesai. **255 automated test lulus.** Aplikasi siap untuk uji penerimaan (UAT) dan deployment,
+yang menunggu: (1) spesifikasi shared hosting aktual, (2) **persetujuan eksplisit deployment production**.
+
+## Modul
 | Modul | Status | Catatan |
 |---|---|---|
-| Authentication | ✅ | |
-| User Management (3 role) | ✅ | BUG-01 diperbaiki |
-| Unit Management (15 unit) | ✅ | |
-| Audit Log | ✅ | BUG-01 diperbaiki |
-| Category / Subcategory | ✅ | CRUD admin, larangan hapus bila terpakai |
-| SLA Policy | ✅ | Due date respons/penyelesaian dihitung saat tiket dibuat |
-| Ticket Creation & Numbering | ✅ | Format `IT-{UNIT}-{YYYYMMDD}-{SEQ}` tetap; prefix dapat dikonfigurasi |
-| Attachment (private) | ✅ | Validasi isi file, unduh via Policy |
-| Tiket Saya / Detail / Dashboard user | ✅ | Termasuk balasan, konfirmasi selesai, buka kembali |
-| Shared Queue IT (filter, cari, urut, paginasi, export XLSX) | ✅ | |
-| Balasan Publik & Catatan Internal (+ lampiran) | ✅ | Privasi internal diuji |
-| Quick Reply (6 template) | ✅ | Halaman kelola template ⏳ Phase 6 |
-| Status, konfirmasi/reopen, auto-close | ✅ | Auto-close butuh Cron |
-| Assignment PIC & Klasifikasi ulang | ✅ | |
-| QR Code flow & UI | ✅ | `/qr/{token}` → login → unit terisi; preview, PNG, PDF (per unit & semua), cetak, regenerate |
-| Notification (in-app) | ✅ | Database channel sinkron, lonceng Livewire polling 60 dtk, halaman notifikasi |
-| PWA-ready | ✅ | Manifest dinamis, ikon, service worker offline minimal |
-| Knowledge Base | ✅ | Artikel, tag, visibilitas, Draft/Published/Archived, FULLTEXT + fallback, artikel terkait tiket, "jadikan artikel" dari tiket |
-| AI Assistant (opsional) | ✅ | Provider Anthropic & OpenAI-compatible; klasifikasi, troubleshooting, ringkasan, draf balasan, tanya KB; default nonaktif |
-| Product settings / branding | ✅ | System Settings: nama, organisasi, kontak, warna, logo, prefix tiket, batas upload, auto-close, KB publik, AI, template quick reply, jalankan tugas terjadwal manual; edisi `almega`/`product` |
-| Analytics & Recurring Issues | ✅ | 6 kartu ringkasan, 5 grafik Chart.js, waktu respons/penyelesaian + SLA %, top 5 unit, aktivitas IT, isu berulang + saran pencegahan, rekomendasi berbasis data |
-| Reporting PDF/Excel | ✅ | Operasional & Manajemen; filter periode (termasuk bulanan) & unit; tanpa catatan internal |
+| Authentication (username/email, rate limit, ganti password wajib, sesi) | ✅ | |
+| User / Unit Management (3 role, 15 unit Almega) | ✅ | Edisi produk: 1 unit `HQ` |
+| Category / Subcategory, SLA | ✅ | |
+| Ticket Creation & Numbering `IT-{UNIT}-{YYYYMMDD}-{SEQ}` | ✅ | Increment atomik, diuji 16 proses paralel |
+| Lampiran privat | ✅ | Validasi isi file |
+| Shared Queue IT + export Excel | ✅ | |
+| Balasan Publik & Catatan Internal, Quick Reply | ✅ | Privasi internal diuji di 6 jalur (halaman, lampiran, riwayat, notifikasi, laporan, AI) |
+| Status, konfirmasi/reopen, auto-close, PIC, klasifikasi ulang, riwayat | ✅ | Auto-close butuh Cron atau tombol manual |
+| QR Code per unit (scan, PNG, PDF, cetak, regenerate) | ✅ | |
+| Notifikasi in-app (lonceng Livewire polling) | ✅ | Tanpa WhatsApp/email (di luar lingkup) |
+| PWA-ready (manifest, ikon, offline page) | ✅ | |
+| Knowledge Base | ✅ | FULLTEXT + fallback |
+| Asisten AI (opsional) | ✅ | Default nonaktif; diuji dengan Fake provider & stub — **belum dicoba dengan API key sungguhan** |
+| Product settings / branding / edisi | ✅ | |
+| Analytics & isu berulang | ✅ | |
+| Laporan Operasional & Manajemen (PDF/Excel) | ✅ | |
+| Audit Log | ✅ | |
+| Paket distribusi & dokumentasi produk | ✅ | `scripts/build-package.sh`; instalasi bersih dari paket diuji |
+| Deployment production it.almegajaya.com | ⏳ | Menunggu persetujuan & data hosting |
 
-Test terakhir: **155 test lulus** (2026-11-22).
-
-**Siklus tiket inti sudah lengkap** (lapor → antrean IT → balas/catatan internal → status → konfirmasi/tutup).
-Belum ada: QR flow & notifikasi (Phase 1d), sehingga user/IT belum mendapat pemberitahuan otomatis.
+## Batasan yang Diketahui
+- Spesifikasi hosting belum diverifikasi (HOSTING_REQUIREMENTS.md §7).
+- Fitur AI belum diuji terhadap API provider sungguhan (butuh API key & persetujuan biaya).
+- Belum ada uji beban HTTP banyak pengguna bersamaan (konkurensi penulisan nomor tiket sudah diuji).
+- Di luar lingkup v1: WhatsApp/email, multi-tenant, lisensi, manajemen aset, semantic search.

@@ -1,8 +1,19 @@
-# CHANGELOG — ALMEGA IT TICKETING SYSTEM
+# CHANGELOG — AI IT Ticketing & Helpdesk Kit (dari ALMEGA IT TICKETING SYSTEM)
 
 Format mengikuti [Keep a Changelog](https://keepachangelog.com/id-ID/1.1.0/).
 
 ## [Unreleased]
+
+## [1.0.0-rc.1] — 2026-11-22 — Phase 8 & 10: Productization & Shared Hosting Preparation
+### Ditambahkan
+- `scripts/build-package.sh [almega|product]`: paket zip siap upload (vendor tanpa dev, asset ter-build, tanpa .env/tests) + `.sha256`; file `VERSION`.
+- `INSTALLATION_GUIDE.md`, `UPDATE_GUIDE.md`, `PRODUCT_FEATURES.md`; README, USER_GUIDE, IT_ADMIN_GUIDE, SYSTEM_ARCHITECTURE, SECURITY_GUIDE,
+  HOSTING_REQUIREMENTS, DEPLOYMENT, BACKUP, DATABASE_DESIGN diperbarui sesuai implementasi.
+- Versi aplikasi tampil di System Settings.
+### Diubah
+- HTTPS dipaksa hanya bila `APP_URL` memakai `https://` (instalasi awal sebelum SSL aktif tetap berfungsi).
+### Diperbaiki
+- Paket membengkak (429 MB) bila Composer memasang dari source → metadata `.git` di `vendor/` dibuang (48 MB).
 
 ## [0.9.0] — 2026-11-22 — Phase 9: QA & Security
 ### Keamanan

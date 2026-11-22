@@ -1,79 +1,47 @@
-# PANDUAN IT & IT ADMIN — ALMEGA IT TICKETING SYSTEM
-
-> Mengikuti implementasi aktual. Bagian ⏳ menyusul pada sprint berikutnya.
+# PANDUAN IT & IT ADMIN
 
 ## 1. Level Akses
-
-| Role | Kemampuan (saat ini) |
+| Role | Kemampuan |
 |---|---|
-| **User** | Dashboard user, profil, ganti password |
-| **IT** | Dashboard IT, antrean tiket semua unit, balasan & catatan internal, status, PIC, klasifikasi, export Excel (⏳ analytics, laporan) |
-| **IT Admin** | Semua kemampuan IT + User Management, Unit Management, Audit Log (⏳ kategori, SLA, QR, pengaturan) |
+| **User** | Membuat & memantau tiket sendiri, Pusat Bantuan |
+| **IT** | Semua tiket seluruh unit, balasan & catatan internal, status, PIC, klasifikasi, Knowledge Base (tulis), Asisten AI, Analytics, Laporan, export |
+| **IT Admin** | Semua hak IT + User, Unit, Kategori, SLA, QR, System Settings, Audit Log |
+Hak akses diperiksa di server (menu hanya pelengkap). Akses tanpa hak → 403/404.
 
-Hak akses diperiksa di server. Membuka URL admin dengan akun non-admin menghasilkan **403 Akses Ditolak**.
+## 2. Menangani Tiket
+- **Semua Tiket** = antrean bersama seluruh unit; menu Tiket Baru/Dalam Proses/Pending/Resolved/Closed = filter status.
+- Filter: unit, kategori, subkategori, prioritas, PIC (*Belum ada PIC*, *Tiket saya*), pelapor, tanggal, *Melewati SLA*; urutan terbaru/terlama/prioritas/aktivitas/batas SLA. **Export Excel** sesuai filter.
+- **Ambil** = jadikan diri sendiri PIC. PIC opsional.
+- **Balasan Publik** terlihat pelapor; **Catatan Internal** (kuning) hanya IT — gunakan untuk data sensitif.
+- **Template balasan cepat** mengisi kolom pesan (dapat diedit sebelum dikirim).
+- **Ubah Status**: hanya transisi valid; **Resolved wajib catatan penyelesaian**; Closed final (catatan internal tetap bisa).
+- **Klasifikasi**: ubah prioritas/kategori; prioritas baru menghitung ulang SLA.
+- **Artikel KB Terkait** & **Jadikan artikel** ada di detail tiket.
+- **Asisten AI** (bila aktif): Klasifikasi → *Isi ke form*; Troubleshooting (rujukan KB); Ringkasan; Draf balasan → *Masukkan ke form balasan*. Selalu periksa sebelum menyimpan/mengirim.
 
-## 2. Akun IT Admin Awal
-Dibuat oleh seeder dari `.env` (`INITIAL_ADMIN_USERNAME`, `INITIAL_ADMIN_PASSWORD`).
-Saat login pertama wajib ganti password. Setelah itu, kosongkan `INITIAL_ADMIN_PASSWORD` di `.env` production.
+## 3. Notifikasi
+Tiket baru → semua IT aktif. Balasan pelapor / buka kembali → PIC (atau semua IT bila tanpa PIC). Ditetapkan sebagai PIC → Anda.
 
-## 3. User Management (`Administrasi → User Management`)
-- **Cari/filter**: nama/username/email, role, unit, status.
-- **Tambah User**: nama, username (huruf kecil, angka, `.`, `-`, `_`), email & HP opsional, role, password sementara.
-  - Role **User** wajib memiliki minimal satu unit; tandai satu sebagai **Utama** (otomatis terisi saat membuat laporan).
-  - Role IT/IT Admin boleh tanpa unit (melihat semua unit).
-  - User baru **wajib mengganti password** saat login pertama.
-- **Ubah User**: data, role, unit, status aktif. Password **tidak** diubah dari form ini.
-- **Nonaktifkan**: hapus centang *Akun aktif*. User langsung keluar pada request berikutnya dan tidak bisa login.
-  User **tidak dihapus** agar riwayat tiket tetap utuh.
-- **Reset Password** (panel kanan halaman ubah): sesi aktif user diputus, user wajib ganti password lagi.
-- Pengaman: Anda tidak dapat menonaktifkan/menurunkan role akun sendiri, dan IT Admin aktif terakhir tidak dapat dinonaktifkan.
+## 4. Knowledge Base
+Lihat [KNOWLEDGE_BASE_GUIDE.md](KNOWLEDGE_BASE_GUIDE.md). **Tanya AI** di halaman KB (bila AI aktif).
 
-## 3b. Menangani Tiket (IT & IT Admin)
-- **Semua Tiket** = shared queue seluruh unit. Menu Tiket Baru/Dalam Proses/Pending/Resolved/Closed adalah filter status.
-- **Filter**: unit, kategori, subkategori, prioritas, PIC (termasuk *Belum ada PIC* / *Tiket saya*), nama pelapor, tanggal, *Melewati SLA*. Urutkan berdasarkan terbaru, terlama, prioritas, aktivitas, atau batas SLA.
-- **Ambil**: menjadikan Anda PIC tiket tanpa PIC. PIC bersifat opsional.
-- **Balasan Publik** terlihat pelapor; **Catatan Internal** (kotak kuning) hanya IT & IT Admin — gunakan untuk informasi sensitif (password, konfigurasi).
-- **Template balasan cepat**: pilih template, teks masuk ke kolom pesan dan dapat diedit sebelum dikirim.
-- **Ubah Status**: hanya transisi yang valid yang ditampilkan. **Resolved wajib catatan penyelesaian** (dikirim ke pelapor). Closed bersifat final.
-- **Klasifikasi**: ubah prioritas/kategori; perubahan prioritas menghitung ulang target SLA.
-- **Export Excel**: mengunduh daftar sesuai filter aktif (maks. 10.000 baris, tanpa catatan internal).
-- Tiket Resolved yang tidak dikonfirmasi pelapor ditutup otomatis setelah `ticket.auto_close_days` hari (butuh Cron).
+## 5. Analytics & Laporan
+- **Analytics**: periode (hari ini … tahun ini, bulan tertentu, kustom) & unit. Definisi metrik ada di DATABASE_DESIGN.md §6.
+- **Isu berulang**: ≥ 3 tiket unit + kategori + subkategori sama dalam periode, dengan saran pencegahan & penanda artikel KB.
+- **Laporan**: Operasional (daftar tiket, respons IT, durasi) atau Manajemen (ringkasan, statistik, tren, aktivitas IT, isu berulang, rekomendasi), PDF/Excel. Laporan bulanan: Periode → *Bulan Tertentu*. PDF operasional maks. 500 tiket — gunakan Excel untuk data lengkap. Catatan internal tidak pernah masuk laporan.
 
-## 4. Unit Management (`Administrasi → Unit Management`)
-- 15 unit awal dibuat oleh seeder (HO, MK, GK, KMC, K57, DR, TS, SCN, O2D, MMJ, PMC, POV, OMA, SH, STZ).
-- **Tambah/Ubah**: kode (huruf kapital & angka, maks. 10), nama, keterangan, urutan, status aktif.
-- **Kode unit** dipakai di nomor tiket (`IT-{KODE}-{YYYYMMDD}-{NNN}`) dan **terkunci** setelah unit memiliki tiket.
-- Unit **tidak dapat dihapus**. Gunakan status nonaktif: unit tidak bisa dipilih untuk tiket baru dan QR-nya ditolak.
-- Setiap unit memiliki token QR acak (⏳ halaman QR Management: generate, unduh PNG/PDF, cetak, regenerate — Phase 1d).
+## 6. Administrasi (IT Admin)
+| Menu | Catatan |
+|---|---|
+| **User Management** | Username huruf kecil; role User wajib ≥1 unit (pilih unit utama); password sementara wajib diganti; nonaktif = sesi diputus; reset password; admin aktif terakhir dilindungi |
+| **Unit Management** | Kode unit dipakai di nomor tiket & terkunci setelah ada tiket; unit tidak dihapus, hanya nonaktif |
+| **Category Management** | Nonaktif = hilang dari form; hapus hanya bila belum pernah dipakai |
+| **SLA Settings** | Respons & penyelesaian (menit) per prioritas; berlaku untuk tiket baru |
+| **QR Management** | Preview, PNG, PDF (per unit / semua), cetak, regenerate token (QR lama tidak berlaku — cetak ulang) |
+| **System Settings** | Branding (nama, organisasi, kontak, warna, logo), prefix nomor tiket, auto-close, batas lampiran, Pusat Bantuan, Asisten AI (+ status & token), template balasan cepat, **Jalankan Tugas Terjadwal** (hosting tanpa Cron) |
+| **Audit Log** | Hanya baca; filter aksi/user/entitas/tanggal |
 
-## 5. Category Management (`Administrasi → Category Management`)
-- 8 kategori & 39 subkategori awal dari seeder.
-- Tambah kategori di form atas; klik nama kategori untuk melihat/mengubah subkategori.
-- **Nonaktif**: tidak muncul di form Buat Laporan; tiket lama tetap utuh.
-- **Hapus** hanya tersedia bila kategori/subkategori belum pernah dipakai tiket.
-
-## 6. SLA Settings (`Administrasi → SLA Settings`)
-- Target **respons** dan **penyelesaian** (menit) per prioritas. Default: Mendesak 30/240, Tinggi 60/480, Sedang 240/1440, Rendah 480/4320.
-- Perubahan hanya berlaku untuk **tiket baru**; tiket lama menyimpan batas waktunya sendiri.
-- SLA nonaktif → tiket prioritas tersebut tidak memiliki batas waktu.
-
-## 7. Audit Log (`Administrasi → Audit Log`)
-Hanya baca. Filter: aksi, user, entitas, rentang tanggal. Klik **detail** untuk melihat nilai sebelum/sesudah.
-
-Aksi yang dicatat saat ini:
-`auth.login`, `auth.logout`, `auth.login_failed`, `auth.login_blocked`, `auth.password_changed`,
-`user.created`, `user.updated`, `user.units_changed`, `user.activated`, `user.deactivated`, `user.password_reset`,
-`user.profile_updated`, `unit.created`, `unit.updated`, `unit.qr_regenerated`, `ticket.created`,
-`category.created|updated|deleted`, `subcategory.created|updated|deleted`, `sla.updated`,
-`ticket.replied`, `ticket.internal_note`, `ticket.status_changed`, `ticket.confirmed`, `ticket.reopened`, `ticket.auto_closed`,
-`ticket.assigned`, `ticket.reclassified`, `ticket.exported`.
-
-Password, token QR, dan remember token **tidak pernah** disimpan di audit log.
-
-## 8. Pengaturan Sistem (tabel `settings`)
-Nilai awal (UI ⏳ Phase 6): `ticket.number_prefix = IT`, `ticket.auto_close_days = 3`, `upload.max_kb = 5120`, `upload.max_files = 5`.
-
-## 9. Operasional Rutin
-- Harian: cek Audit Log untuk `auth.login_failed` berulang dari IP yang sama.
-- Bulanan: tinjau user nonaktif / user yang belum pernah login.
-- Backup: lihat [BACKUP_RESTORE_GUIDE.md](BACKUP_RESTORE_GUIDE.md).
+## 7. Operasional Rutin
+- Harian: antrean *Melewati SLA*, *Belum ada PIC*; Audit Log `auth.login_failed` berulang.
+- Mingguan: Analytics → isu berulang → buat artikel KB / jadwalkan maintenance.
+- Bulanan: Laporan Manajemen bulan lalu; tinjau user nonaktif; uji restore backup tiap 3 bulan.

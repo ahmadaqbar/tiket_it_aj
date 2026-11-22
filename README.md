@@ -1,80 +1,35 @@
-# ALMEGA IT TICKETING SYSTEM
+# AI IT Ticketing & Helpdesk Kit
+### (dikembangkan dari ALMEGA IT TICKETING SYSTEM — PT Almega Jaya Group)
 
-Sistem IT Helpdesk & Ticket Management terpusat untuk **PT Almega Jaya Group** (15 unit operasional).
-Production: **https://it.almegajaya.com** (shared hosting).
+Sistem IT Helpdesk & Ticketing terpusat untuk bisnis multi-unit, dapat berjalan di **shared hosting PHP**.
+Satu codebase, dua edisi: **Edisi Almega** (production: https://it.almegajaya.com, 15 unit) dan **Edisi Produk** untuk organisasi lain.
 
-> **Status:** Foundation + siklus tiket inti selesai (lapor, antrean IT, balasan, catatan internal, status, PIC). QR flow & notifikasi menyusul (Phase 1d).
-> Proyek sedang dikembangkan menjadi **AI IT Ticketing & Helpdesk Kit** — lihat [PROJECT_STATUS.md](PROJECT_STATUS.md),
-> [PROJECT_AUDIT.md](PROJECT_AUDIT.md), dan [PRODUCTIZATION_PLAN.md](PRODUCTIZATION_PLAN.md).
+> **Versi:** 1.0.0-rc.1 · **Status:** seluruh fase pengembangan selesai & teruji (255 test).
+> Deployment production belum dilakukan dan menunggu persetujuan + data spesifikasi hosting. Lihat [PROJECT_STATUS.md](PROJECT_STATUS.md).
+
+## Fitur Utama
+Laporan dari HP + QR per unit · antrean IT bersama · balasan & catatan internal · status/SLA/PIC · notifikasi in-app ·
+Knowledge Base · Asisten AI opsional · Analytics & isu berulang · Laporan PDF/Excel · System Settings & branding · audit log.
+Rincian: [PRODUCT_FEATURES.md](PRODUCT_FEATURES.md).
 
 ## Stack
+Laravel 13 · PHP ≥ 8.3 · MySQL 8 / MariaDB 10.6+ · Blade + Livewire 4 + Alpine.js · Tailwind CSS 4 · Chart.js ·
+dompdf · openspout · chillerlan/php-qrcode. Tanpa Redis, Supervisor, Docker, WebSocket, atau Node.js di server.
 
-Laravel 13 · PHP ≥ 8.3 · MySQL 8 / MariaDB 10.6+ · Blade + Livewire 4 + Alpine.js · Tailwind CSS 4 ·
-dompdf · openspout · chillerlan/php-qrcode. Tanpa Redis, Supervisor, Docker, atau Node.js di server.
-
-## Fitur yang Sudah Berfungsi (Sprint 1)
-
-- Login dengan **username atau email**, logout, "ingat saya", rate limiting (5 percobaan/menit per akun+IP, 20/menit per IP)
-- Wajib ganti password sementara saat login pertama / setelah reset admin
-- Ganti password (memutus sesi di perangkat lain), profil (nama, email, HP)
-- 3 level akses **USER / IT / IT_ADMIN**: middleware `role:`, Gate `access-it` / `access-admin`, Policy per model
-- Manajemen user (multi-unit + unit utama, aktif/nonaktif, reset password, proteksi admin terakhir)
-- Manajemen unit (15 unit via seeder, token QR aman per unit, kode terkunci setelah dipakai tiket, tidak bisa dihapus)
-- Audit log append-only (login, logout, login gagal, user, unit, password) + halaman filter khusus IT Admin
-- Layout responsif: sidebar desktop, drawer + bottom navigation mobile, Bahasa Indonesia
-
-**Core Ticketing (Phase 1b):** form Buat Laporan satu halaman, nomor tiket otomatis `IT-{UNIT}-{YYYYMMDD}-{SEQ}`,
-lampiran privat, Tiket Saya/Riwayat/Detail, dashboard dengan data nyata, Category Management, SLA Settings.
-
-**IT Management (Phase 1c):** shared queue seluruh unit (filter unit/kategori/subkategori/status/prioritas/tanggal/PIC/pelapor,
-pencarian, urutan, paginasi, export Excel), balasan publik & catatan internal dengan lampiran, quick reply, perubahan status
-(+ catatan penyelesaian wajib), konfirmasi/buka kembali oleh pelapor, auto-close, assignment PIC, klasifikasi ulang + SLA.
-
-Belum tersedia: QR flow, notifikasi, analytics, laporan PDF/Excel, Knowledge Base, AI.
-
-## Setup Development (Windows — Laragon/XAMPP)
-
-Prasyarat: PHP 8.3 (ext: pdo_mysql, mbstring, fileinfo, zip, gd, intl, xml), Composer 2, Node.js 20+, MySQL 8 / MariaDB 10.6+.
-
+## Mulai Cepat (development)
 ```bash
-git clone <repo> almega-it && cd almega-it
-composer install
-copy .env.example .env        # Linux/macOS: cp .env.example .env
-php artisan key:generate
+composer install && cp .env.example .env && php artisan key:generate
+php artisan migrate --seed
+php artisan db:seed --class=DemoSeeder && php artisan db:seed --class=DemoTicketSeeder   # opsional, data contoh
+npm install && npm run build && php artisan serve
 ```
-
-Buat database `almega_it_ticketing` (utf8mb4_unicode_ci), isi `DB_*` dan `INITIAL_ADMIN_*` di `.env`, lalu:
-
-```bash
-php artisan migrate --seed                  # master data + 1 akun IT Admin
-php artisan db:seed --class=DemoSeeder      # OPSIONAL, lokal saja: user contoh (password: password123)
-npm install
-npm run build                               # atau: npm run dev
-php artisan serve
-```
-
-Buka http://localhost:8000 dan login dengan akun IT Admin dari `.env`.
-
-> Bungkus nilai `.env` yang mengandung `#`, spasi, atau `$` dengan tanda kutip ganda.
-
-## Testing
-
-Test memakai database MySQL/MariaDB terpisah `almega_it_ticketing_test` (lihat `phpunit.xml`).
-
-```bash
-php artisan test
-```
+Test: `php artisan test` (database MySQL/MariaDB `almega_it_ticketing_test`, lihat `phpunit.xml`).
+Paket distribusi: `bash scripts/build-package.sh [almega|product]`.
 
 ## Dokumentasi
-
-| Dokumen | Isi |
+| Topik | Dokumen |
 |---|---|
-| [DEVELOPMENT_PLAN.md](DEVELOPMENT_PLAN.md) | Audit, stack, rencana & status sprint |
-| [DATABASE_DESIGN.md](DATABASE_DESIGN.md) | Skema, relasi, penomoran tiket, aturan status |
-| [SYSTEM_ARCHITECTURE.md](SYSTEM_ARCHITECTURE.md) | Arsitektur & alur request |
-| [HOSTING_REQUIREMENTS.md](HOSTING_REQUIREMENTS.md) | Kebutuhan shared hosting |
-| [DEPLOYMENT_SHARED_HOSTING.md](DEPLOYMENT_SHARED_HOSTING.md) | Langkah deployment, cron, troubleshooting |
-| [SECURITY_GUIDE.md](SECURITY_GUIDE.md) | Kontrol keamanan |
-| [BACKUP_RESTORE_GUIDE.md](BACKUP_RESTORE_GUIDE.md) | Prosedur backup & restore |
-| [USER_GUIDE.md](USER_GUIDE.md) · [IT_ADMIN_GUIDE.md](IT_ADMIN_GUIDE.md) | Panduan pengguna |
-| [TESTING_REPORT.md](TESTING_REPORT.md) · [CHANGELOG.md](CHANGELOG.md) | Hasil uji & riwayat perubahan |
+| Status, audit, rencana | [PROJECT_STATUS.md](PROJECT_STATUS.md) · [PROJECT_AUDIT.md](PROJECT_AUDIT.md) · [PRODUCTIZATION_PLAN.md](PRODUCTIZATION_PLAN.md) · [DEVELOPMENT_PLAN.md](DEVELOPMENT_PLAN.md) · [DEVELOPMENT_LOG.md](DEVELOPMENT_LOG.md) |
+| Instalasi & operasi | [INSTALLATION_GUIDE.md](INSTALLATION_GUIDE.md) · [HOSTING_REQUIREMENTS.md](HOSTING_REQUIREMENTS.md) · [DEPLOYMENT_SHARED_HOSTING.md](DEPLOYMENT_SHARED_HOSTING.md) · [UPDATE_GUIDE.md](UPDATE_GUIDE.md) · [BACKUP_RESTORE_GUIDE.md](BACKUP_RESTORE_GUIDE.md) |
+| Pengguna | [USER_GUIDE.md](USER_GUIDE.md) · [IT_ADMIN_GUIDE.md](IT_ADMIN_GUIDE.md) · [KNOWLEDGE_BASE_GUIDE.md](KNOWLEDGE_BASE_GUIDE.md) · [AI_INTEGRATION_GUIDE.md](AI_INTEGRATION_GUIDE.md) |
+| Teknis | [SYSTEM_ARCHITECTURE.md](SYSTEM_ARCHITECTURE.md) · [DATABASE_DESIGN.md](DATABASE_DESIGN.md) · [SECURITY_GUIDE.md](SECURITY_GUIDE.md) · [TESTING_REPORT.md](TESTING_REPORT.md) · [CHANGELOG.md](CHANGELOG.md) |

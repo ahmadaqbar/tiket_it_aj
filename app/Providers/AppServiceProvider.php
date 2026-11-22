@@ -33,7 +33,8 @@ class AppServiceProvider extends ServiceProvider
         // Deteksi lazy loading (N+1) saat development/test.
         Model::preventLazyLoading(! $this->app->isProduction());
 
-        if ($this->app->isProduction()) {
+        // Paksa HTTPS hanya bila APP_URL memakai https — instalasi awal sebelum SSL aktif tetap dapat dipakai.
+        if ($this->app->isProduction() && str_starts_with((string) config('app.url'), 'https://')) {
             URL::forceScheme('https');
         }
 

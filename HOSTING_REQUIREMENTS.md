@@ -23,6 +23,8 @@ Target production: **https://it.almegajaya.com** (shared hosting)
 | 10 | Kapasitas storage | 2 GB | 5 GB+ | 2 GB (aplikasi ±150 MB, sisanya attachment & backup) | ☐ |
 | 11 | `memory_limit` | 128M | 256M | 128M | ☐ |
 | 12 | SSL / HTTPS | Wajib | AutoSSL / Let's Encrypt | Tersedia (AutoSSL cPanel) | ☐ |
+| 13 | Koneksi HTTPS keluar (hanya bila AI diaktifkan) | Port 443 ke host provider AI | — | Diizinkan (umum di shared hosting) | ☐ |
+| 14 | Fungsi PHP `set_time_limit`, `proc_open` tidak wajib | — | — | Laporan tetap dibatasi ukuran agar < 30 dtk | ☐ |
 
 ## 2. PHP Extensions yang Dibutuhkan
 
@@ -39,6 +41,8 @@ Target production: **https://it.almegajaya.com** (shared hosting)
 | `bcmath` | Tidak dibutuhkan | — |
 | `redis`, `imagick`, `pcntl`, `sockets` | **Tidak dibutuhkan** | — |
 
+MySQL/MariaDB harus mendukung index **FULLTEXT pada InnoDB** (MySQL ≥ 5.6, MariaDB ≥ 10.0) — dipakai pencarian Knowledge Base.
+
 Cara cek cepat di hosting: buat file sementara `phpinfo.php` → buka → **hapus segera** setelah dicek.
 
 ## 3. Hal yang TIDAK Dibutuhkan (sesuai batasan shared hosting)
@@ -52,7 +56,7 @@ Cara cek cepat di hosting: buat file sementara `phpinfo.php` → buka → **hapu
 
 ## 4. Keputusan Versi
 
-| Komponen | Versi dipilih | Alasan |
+| Komponen | Versi terpasang (dikunci di composer.lock / package-lock.json) | Alasan |
 |---|---|---|
 | Laravel | **13.x** | Rilis stabil terbaru, dukungan keamanan lebih panjang. Laravel 12 (PHP 8.2) dukungan keamanannya berakhir Feb 2027 |
 | PHP | **≥ 8.3** | Kebutuhan Laravel 13 & openspout 4 |
@@ -99,3 +103,12 @@ Rekomendasi Windows: **Laragon** (PHP 8.3 + MySQL 8 + Composer + Node) atau XAMP
 8. ☐ Jadwal backup otomatis dari pihak hosting
 9. ☐ Database MySQL: versi, batas ukuran, akses phpMyAdmin
 10. ☐ AutoSSL aktif untuk subdomain
+
+## 8. Ukuran & Kebutuhan Disk (hasil Phase 10)
+- Paket instalasi (`scripts/build-package.sh`): ±48 MB zip; ±150 MB setelah diekstrak (mayoritas `vendor/`).
+- Database: ±445 KB (gzip) untuk ±5.800 tiket + 2.400 notifikasi pada uji; tumbuh sesuai volume.
+- Lampiran: sesuai pemakaian (batas default 5 MB × 5 file per kiriman).
+
+## 9. Hasil Uji Performa Acuan (lingkungan dev)
+Antrean/dashboard 50–63 ms, analytics ≤ 114 ms pada ±5.800 tiket; export XLSX 5.800 baris 1,4 dtk; PDF operasional ±7 dtk / 500 baris.
+Shared hosting umumnya lebih lambat — gunakan angka ini sebagai baseline saat smoke test.
