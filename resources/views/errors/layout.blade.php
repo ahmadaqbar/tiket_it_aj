@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('code') · ALMEGA IT Ticketing</title>
+    <title>@yield('code') · {{ rescue(fn () => \App\Support\Branding::shortName(), config('helpdesk.defaults.short_name'), false) }}</title>
     <style>
         body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;background:#f9fafb;color:#1f2937;display:flex;min-height:100vh;align-items:center;justify-content:center;padding:1rem}
         .box{max-width:28rem;text-align:center}.code{font-size:3rem;font-weight:700;color:#16432b;margin:0}

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\QrCodeController;
 use App\Http\Controllers\Admin\SlaPolicyController;
 use App\Http\Controllers\Admin\UnitController;
 use App\Http\Controllers\Admin\UserController;
@@ -12,6 +13,9 @@ use App\Http\Controllers\Auth\ProfileController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\It\DashboardController as ItDashboardController;
 use App\Http\Controllers\It\TicketController as ItTicketController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\PwaController;
+use App\Http\Controllers\QrController;
 use App\Http\Controllers\TicketActionController;
 use App\Http\Controllers\User\DashboardController as UserDashboardController;
 use App\Http\Controllers\User\TicketController as UserTicketController;
@@ -20,6 +24,11 @@ use Illuminate\Support\Facades\Route;
 /*
 | Tidak ada registrasi publik. Seluruh akun dibuat oleh IT Admin.
 */
+
+Route::get('/manifest.webmanifest', [PwaController::class, 'manifest'])->name('pwa.manifest');
+
+// QR unit: publik, hanya mengidentifikasi unit lalu mengarahkan ke login / form laporan.
+Route::get('/qr/{token}', [QrController::class, 'show'])->middleware('throttle:30,1')->name('qr.show');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'create'])->name('login');
@@ -41,6 +50,10 @@ Route::middleware(['auth', 'active'])->group(function () {
 
         // Lampiran: otorisasi di Policy (pemilik tiket / IT), bukan di route.
         Route::get('/lampiran/{attachment}', [AttachmentController::class, 'show'])->name('attachments.show');
+
+        Route::get('/notifikasi', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::get('/notifikasi/{id}', [NotificationController::class, 'open'])->name('notifications.open');
+        Route::post('/notifikasi/baca-semua', [NotificationController::class, 'readAll'])->name('notifications.read-all');
 
         // Balasan tiket (pelapor & IT). Visibilitas & hak akses diperiksa di ReplyRequest + service.
         Route::post('/tiket/{ticket}/balasan', [TicketActionController::class, 'reply'])->middleware('throttle:tickets')->name('tickets.reply');
@@ -77,6 +90,13 @@ Route::middleware(['auth', 'active'])->group(function () {
             Route::put('users/{user}/password', [UserController::class, 'resetPassword'])->name('users.password');
 
             Route::resource('units', UnitController::class)->except(['show', 'destroy']);
+
+            Route::get('qr', [QrCodeController::class, 'index'])->name('qr.index');
+            Route::get('qr/semua.pdf', [QrCodeController::class, 'pdfAll'])->name('qr.pdf-all');
+            Route::get('qr/{unit}.png', [QrCodeController::class, 'png'])->name('qr.png');
+            Route::get('qr/{unit}.pdf', [QrCodeController::class, 'pdf'])->name('qr.pdf');
+            Route::get('qr/{unit}/cetak', [QrCodeController::class, 'print'])->name('qr.print');
+            Route::post('qr/{unit}/regenerate', [QrCodeController::class, 'regenerate'])->name('qr.regenerate');
 
             Route::get('categories', [CategoryController::class, 'index'])->name('categories.index');
             Route::post('categories', [CategoryController::class, 'store'])->name('categories.store');

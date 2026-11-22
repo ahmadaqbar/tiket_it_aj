@@ -13,7 +13,7 @@ class DatabaseSeederTest extends TestCase
 {
     public function test_production_seeder_creates_only_master_data_and_one_admin(): void
     {
-        config(['almega.initial_admin.password' => 'AwalAdmin123', 'almega.initial_admin.username' => 'itadmin']);
+        config(['helpdesk.initial_admin.password' => 'AwalAdmin123', 'helpdesk.initial_admin.username' => 'itadmin']);
 
         $this->seed(DatabaseSeeder::class);
         $this->seed(DatabaseSeeder::class); // idempotent

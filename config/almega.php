@@ -1,18 +1,11 @@
 <?php
 
 /*
-| Konfigurasi khusus ALMEGA IT TICKETING SYSTEM.
-| Nilai runtime yang dapat diubah IT Admin disimpan di tabel `settings`.
+| Dipertahankan untuk kompatibilitas mundur (Sprint 1). Konfigurasi aktif ada di config/helpdesk.php.
 */
 
 return [
     'organization' => 'PT Almega Jaya Group',
     'production_url' => 'https://it.almegajaya.com',
-
-    'initial_admin' => [
-        'name' => env('INITIAL_ADMIN_NAME', 'IT Administrator'),
-        'username' => env('INITIAL_ADMIN_USERNAME', 'itadmin'),
-        'email' => env('INITIAL_ADMIN_EMAIL'),
-        'password' => env('INITIAL_ADMIN_PASSWORD'),
-    ],
+    'initial_admin' => (require __DIR__.'/helpdesk.php')['initial_admin'],
 ];

@@ -105,3 +105,13 @@
 ### Pengujian Browser (Playwright, end-to-end)
 IT (desktop 1440px) ambil tiket dari antrean → catatan internal → quick reply (template masuk ke textarea, dapat diedit) → Dalam Proses → Resolved dengan catatan → export XLSX terunduh.
 User (iPhone 13) membuka tiket: balasan & catatan penyelesaian terlihat, **teks catatan internal tidak ada di HTML**, konfirmasi "Ya, sudah selesai" → Closed. Tidak ada error JavaScript.
+
+## Phase 1d — QR & Notifikasi (2026-11-22)
+**Hasil: 176 test · 622 assertion · 0 gagal** (21 test baru).
+- `QrCodeTest` (11): alur guest→login→form terisi; sumber QR; token invalid/unit nonaktif 404; QR tidak memberi akses data tiket;
+  user unit lain diperingatkan; IT diarahkan ke antrean unit; rate limit; QR Management khusus IT Admin; PNG valid (GD), PDF valid,
+  halaman cetak; regenerate membatalkan token lama + audit; manifest PWA mengikuti branding.
+- `NotificationTest` (10): penerima per pemicu, catatan internal tidak memicu & tidak bocor ke notifikasi, PIC vs semua IT,
+  tidak ada notifikasi ganda saat Resolved dengan catatan, ambil sendiri tidak memberi notifikasi, buka notifikasi menandai dibaca
+  & redirect sesuai role, notifikasi milik orang lain 404, tandai semua dibaca, komponen Livewire lonceng.
+- Browser (Playwright): scan QR di iPhone 13 → login → form unit DR → tiket; lonceng IT menampilkan "1 belum dibaca", update Livewire HTTP 200; tanpa error JS.

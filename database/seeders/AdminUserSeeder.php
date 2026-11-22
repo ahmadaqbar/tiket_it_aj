@@ -9,7 +9,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
 /**
- * Membuat satu akun IT Admin awal dari config/almega.php (.env) bila belum ada IT Admin.
+ * Membuat satu akun IT Admin awal dari config/helpdesk.php (.env) bila belum ada IT Admin.
  * Tidak ada password yang ditulis di source code.
  */
 class AdminUserSeeder extends Seeder
@@ -22,7 +22,7 @@ class AdminUserSeeder extends Seeder
             return;
         }
 
-        $config = config('almega.initial_admin');
+        $config = config('helpdesk.initial_admin');
         $password = $config['password'] ?: Str::password(16, symbols: false);
 
         User::create([

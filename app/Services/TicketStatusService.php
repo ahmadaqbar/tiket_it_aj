@@ -37,6 +37,7 @@ class TicketStatusService
         private readonly TicketReplyService $replies,
         private readonly AuditService $audit,
         private readonly SettingService $settings,
+        private readonly NotificationService $notifications,
     ) {}
 
     /** @return array<TicketStatus> */
@@ -70,7 +71,7 @@ class TicketStatusService
 
             // Pesan dikirim sebelum status diterapkan, agar penutupan (CLOSED) tetap dapat menyertakan pesan.
             if (trim((string) $message) !== '') {
-                $this->replies->add($ticket, $actor, $message, ReplyVisibility::PUBLIC);
+                $this->replies->add($ticket, $actor, $message, ReplyVisibility::PUBLIC, notify: false);
             }
 
             $this->apply($ticket, $to);
@@ -83,6 +84,7 @@ class TicketStatusService
             $this->tickets->history($ticket, $actor, $isReopen ? TicketHistory::REOPENED : TicketHistory::STATUS_CHANGED, $from->value, $to->value);
             $this->audit->log('ticket.status_changed', $ticket, "{$ticket->ticket_number}: {$from->value} → {$to->value}",
                 ['status' => $from->value], ['status' => $to->value]);
+            $this->notifications->statusChanged($ticket, $actor);
 
             return $ticket;
         });
@@ -100,6 +102,7 @@ class TicketStatusService
 
             $this->tickets->history($ticket, $reporter, TicketHistory::CONFIRMED, TicketStatus::RESOLVED->value, TicketStatus::CLOSED->value);
             $this->audit->log('ticket.confirmed', $ticket, "{$ticket->ticket_number} dikonfirmasi selesai oleh pelapor");
+            $this->notifications->confirmedByReporter($ticket, $reporter);
 
             return $ticket;
         });
@@ -118,7 +121,8 @@ class TicketStatusService
 
             $this->tickets->history($ticket, $reporter, TicketHistory::REOPENED, TicketStatus::RESOLVED->value, TicketStatus::IN_PROGRESS->value, $reason);
             $this->audit->log('ticket.reopened', $ticket, "{$ticket->ticket_number} dibuka kembali oleh pelapor");
-            $this->replies->add($ticket, $reporter, 'Tiket dibuka kembali: '.$reason, ReplyVisibility::PUBLIC, recordHistory: false);
+            $this->replies->add($ticket, $reporter, 'Tiket dibuka kembali: '.$reason, ReplyVisibility::PUBLIC, recordHistory: false, notify: false);
+            $this->notifications->reopenedByReporter($ticket, $reporter);
 
             return $ticket;
         });
@@ -153,6 +157,7 @@ class TicketStatusService
                     $this->tickets->history($ticket, null, TicketHistory::AUTO_CLOSED, TicketStatus::RESOLVED->value, TicketStatus::CLOSED->value,
                         "Tidak ada konfirmasi pelapor dalam {$days} hari");
                     $this->audit->log('ticket.auto_closed', $ticket, "{$ticket->ticket_number} ditutup otomatis", userId: null);
+                    $this->notifications->statusChanged($ticket, null);
                     $closed->push($ticket);
                 });
             });

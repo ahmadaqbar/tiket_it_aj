@@ -20,6 +20,7 @@ class TicketService
         private readonly TicketNumberService $numbers,
         private readonly AttachmentService $attachments,
         private readonly AuditService $audit,
+        private readonly NotificationService $notifications,
     ) {}
 
     /**
@@ -71,6 +72,8 @@ class TicketService
                     'source' => $source->value,
                     'attachments' => count($files),
                 ]);
+
+                $this->notifications->ticketCreated($ticket, $reporter);
 
                 return $ticket;
             });

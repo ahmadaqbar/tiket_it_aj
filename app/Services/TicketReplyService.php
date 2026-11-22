@@ -20,12 +20,13 @@ class TicketReplyService
         private readonly TicketService $tickets,
         private readonly AttachmentService $attachments,
         private readonly AuditService $audit,
+        private readonly NotificationService $notifications,
     ) {}
 
     /**
      * @param  array<UploadedFile>  $files
      */
-    public function add(Ticket $ticket, User $author, string $message, ReplyVisibility $visibility, array $files = [], bool $recordHistory = true): TicketReply
+    public function add(Ticket $ticket, User $author, string $message, ReplyVisibility $visibility, array $files = [], bool $recordHistory = true, bool $notify = true): TicketReply
     {
         // Aturan visibilitas ditegakkan di service, bukan hanya di form.
         if ($visibility === ReplyVisibility::INTERNAL && ! $author->isItStaff()) {
@@ -39,7 +40,7 @@ class TicketReplyService
         }
 
         try {
-            $reply = DB::transaction(function () use ($ticket, $author, $message, $visibility, $files, $recordHistory) {
+            $reply = DB::transaction(function () use ($ticket, $author, $message, $visibility, $files, $recordHistory, $notify) {
                 $reply = TicketReply::create([
                     'ticket_id' => $ticket->id,
                     'user_id' => $author->id,
@@ -67,6 +68,11 @@ class TicketReplyService
 
                 $this->audit->log($visibility === ReplyVisibility::INTERNAL ? 'ticket.internal_note' : 'ticket.replied', $ticket,
                     "{$ticket->ticket_number}: ".Str::limit(strip_tags($message), 60), newValues: ['reply_id' => $reply->id, 'attachments' => count($files)]);
+
+                // Catatan internal tidak pernah memicu notifikasi ke pelapor.
+                if ($notify && $visibility === ReplyVisibility::PUBLIC) {
+                    $this->notifications->replied($ticket, $author);
+                }
 
                 return $reply;
             });

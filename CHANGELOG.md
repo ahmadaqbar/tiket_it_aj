@@ -4,6 +4,19 @@ Format mengikuti [Keep a Changelog](https://keepachangelog.com/id-ID/1.1.0/).
 
 ## [Unreleased]
 
+## [0.4.0] — 2026-11-22 — Phase 1d: QR & Notifikasi
+### Ditambahkan
+- `/qr/{token}` (publik, rate limit 30/menit): unit tersimpan di sesi → login → form laporan dengan unit terisi; sumber tiket `QR`.
+  IT yang scan diarahkan ke antrean unit; user dari unit lain mendapat peringatan.
+- QR Management (IT Admin): preview SVG, unduh PNG, PDF A5 per unit & semua unit (dompdf), halaman cetak, regenerate token.
+- Notifikasi in-app (Laravel database notification, tanpa queue/Redis): tiket baru → semua IT aktif; balasan IT → pelapor;
+  balasan pelapor → PIC/semua IT; perubahan status/resolved/closed → pelapor; reopen/konfirmasi → PIC; assignment → PIC.
+  Catatan internal tidak memicu notifikasi. Pelaku tidak menerima notifikasinya sendiri.
+- Lonceng notifikasi (komponen Livewire `NotificationBell`, `wire:poll.60s`), halaman Notifikasi, tandai semua dibaca.
+- PWA: `manifest.webmanifest` (mengikuti branding), ikon 192/512, `sw.js` (hanya halaman offline, tidak meng-cache halaman berlogin).
+- `config/helpdesk.php` (edisi `almega`/`product`) dan helper `Branding`; layout tidak lagi hardcode nama Almega
+  (tampilan Edisi Almega tidak berubah). `config/almega.php` dipertahankan untuk kompatibilitas.
+
 ## [0.3.0] — 2026-11-22 — Phase 1c: IT Management
 
 ### Ditambahkan

@@ -39,15 +39,16 @@ class ItQueueTest extends TestCase
             'subcategory_id' => $this->subcategory('Network & Internet', 'WiFi')->id]);
         $b->forceFill(['status' => 'PENDING', 'assigned_to' => $it->id])->save();
 
-        $see = fn (string $query, array $visible, array $hidden) => tap($this->actingAs($it)->get('/it/tiket?'.$query)->assertOk(),
-            function ($r) use ($visible, $hidden) {
-                foreach ($visible as $t) {
-                    $r->assertSee($t->ticket_number);
-                }
-                foreach ($hidden as $t) {
-                    $r->assertDontSee($t->ticket_number);
-                }
-            });
+        // Diperiksa lewat data paginator: lonceng notifikasi di layout juga memuat nomor tiket.
+        $see = function (string $query, array $visible, array $hidden) use ($it) {
+            $numbers = $this->actingAs($it)->get('/it/tiket?'.$query)->assertOk()->viewData('tickets')->pluck('ticket_number');
+            foreach ($visible as $t) {
+                $this->assertTrue($numbers->contains($t->ticket_number), "{$query}: {$t->ticket_number} harus tampil");
+            }
+            foreach ($hidden as $t) {
+                $this->assertFalse($numbers->contains($t->ticket_number), "{$query}: {$t->ticket_number} tidak boleh tampil");
+            }
+        };
 
         $see('unit_id='.$this->unit('DR')->id, [$a], [$b]);
         $see('status=PENDING', [$b], [$a]);

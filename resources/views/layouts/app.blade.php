@@ -11,7 +11,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#16432b">
-    <title>{{ isset($title) ? $title.' · ' : '' }}ALMEGA IT Ticketing</title>
+    <title>{{ isset($title) ? $title.' · ' : '' }}{{ \App\Support\Branding::shortName() }}</title>
+    <link rel="manifest" href="{{ route('pwa.manifest') }}">
+    <link rel="icon" href="{{ asset('icons/icon-192.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('icons/icon-192.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
@@ -27,7 +30,7 @@
             <a href="{{ route('home') }}" class="flex items-center gap-2">
                 <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-700 text-sm font-bold text-white">IT</span>
                 <span class="leading-tight">
-                    <span class="block text-sm font-semibold text-gray-900">ALMEGA IT</span>
+                    <span class="block text-sm font-semibold text-gray-900">{{ \App\Support\Branding::shortName() }}</span>
                     <span class="block text-[11px] text-gray-500">Ticketing System</span>
                 </span>
             </a>
@@ -89,6 +92,7 @@
             <p class="truncate text-sm font-medium text-gray-700">{{ $title ?? '' }}</p>
             <div class="ml-auto flex items-center gap-2">
                 @isset($topbar){{ $topbar }}@endisset
+                <livewire:notification-bell />
             </div>
         </header>
 
@@ -121,5 +125,8 @@
 
     @livewireScripts
     @stack('scripts')
+    <script>
+        if ('serviceWorker' in navigator) { window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {})); }
+    </script>
 </body>
 </html>

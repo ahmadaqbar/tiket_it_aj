@@ -17,6 +17,7 @@ class TicketAssignmentService
     public function __construct(
         private readonly TicketService $tickets,
         private readonly AuditService $audit,
+        private readonly NotificationService $notifications,
     ) {}
 
     public function assign(Ticket $ticket, ?User $assignee, User $actor, ?string $note = null): Ticket
@@ -47,6 +48,9 @@ class TicketAssignmentService
                 $previous?->name, $assignee?->name);
             $this->audit->log('ticket.assigned', $ticket, "{$ticket->ticket_number}: PIC ".($assignee?->name ?? 'dilepas'),
                 ['assigned_to' => $previous?->id], ['assigned_to' => $assignee?->id]);
+            if ($assignee) {
+                $this->notifications->assigned($ticket, $assignee, $actor);
+            }
 
             return $ticket;
         });

@@ -47,3 +47,11 @@ Catatan kronologis keputusan dan pekerjaan. Entri terbaru di bawah.
   - Export antrean memakai openspout ke file temp lalu dihapus setelah dikirim (hemat memori, cocok shared hosting).
   - Kelola template quick reply via UI ditunda ke Phase 6 (System Settings) agar tidak menambah menu baru.
 - Hasil: 155/155 test; smoke test end-to-end IT ↔ user tanpa error JS.
+
+## 2026-11-22 — Phase 1d: QR & Notifikasi
+- QR: token tetap di `units.qr_token` (Sprint 1). Guest → `redirect()->guest(login)` sehingga setelah login kembali ke URL QR.
+- Notifikasi dikirim **sinkron** via channel database (tanpa queue) agar tidak bergantung Cron/worker.
+- Satu-satunya `{!! !!}` baru: SVG QR hasil library dari URL internal (bukan input user).
+- Temuan test: lonceng di layout memuat nomor tiket → test filter antrean diubah memeriksa data paginator.
+- Browser: alur scan QR → login → laporan (IT-DR-20261122-002), lonceng IT menampilkan notifikasi, request Livewire update HTTP 200.
+- Hasil: 176/176 test.
