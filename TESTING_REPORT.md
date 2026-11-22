@@ -122,3 +122,14 @@ melihat Published+Publik (internal/draft/arsip → 404)**; IT melihat semua; use
 hitung tampilan; artikel terkait menghormati visibilitas; "jadikan artikel" tanpa catatan internal; pusat bantuan dapat dinonaktifkan;
 konten di-escape (XSS); subkategori harus sesuai kategori.
 Manual: jalur FULLTEXT pada DB dev — query memakai `MATCH`, artikel paling relevan di urutan pertama.
+
+## Phase 3–5 — AI (2026-11-22)
+**Hasil: 224 test · 802 assertion · 0 gagal** (36 test baru). Tidak ada panggilan API berbayar (`FakeAiProvider`, `Http::fake`).
+- `AiFoundationTest` (12): default nonaktif & ticketing tetap jalan; konfigurasi tidak lengkap; format request/response Anthropic & OpenAI-compatible;
+  HTTP 401 ditangani tanpa membocorkan key; timeout; rate limit per user & harian; log hanya metadata; JSON tidak valid; key tidak di HTML; USER 403.
+- `TicketAiTest` (9): klasifikasi dipetakan ke master data & **tidak mengubah tiket**; nilai tidak valid dibuang; **klasifikasi & draf tanpa catatan internal,
+  nama, email, telepon, password**; ringkasan menyertakan catatan internal; **prompt injection dinetralkan**; troubleshooting hanya artikel Published &
+  referensi tervalidasi (ID karangan dibuang); tanpa KB → "saran umum"; draf tidak terkirim; gaya tidak valid 422.
+- `KnowledgeBaseAiTest` (5): referensi tervalidasi; tanpa artikel → bukan "berdasarkan KB" walau model mengklaim; draft/arsip tidak dikirim; validasi; halaman nonaktif.
+- `Unit/AiRedactionTest` (10): pola redaksi, data teknis (IP, jam, nomor tiket) tetap utuh, pembungkus data, ekstraksi JSON.
+- Browser (stub lokal berformat Anthropic): klasifikasi → isi form (belum tersimpan), draf → textarea (belum terkirim), tanya KB; `ai_requests` tercatat; tanpa error JS.

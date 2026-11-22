@@ -63,3 +63,12 @@ Catatan kronologis keputusan dan pekerjaan. Entri terbaru di bawah.
 - Temuan: kata umum ("tidak") memberi relevansi ~0 → ditambah syarat relevansi > 0; bug presedensi `??` pada select visibilitas form diperbaiki sebelum rilis.
 - Scope `KbArticle::readableBy()` menjadi satu-satunya pintu artikel untuk user & konteks AI.
 - Hasil: 188/188 test.
+
+## 2026-11-22 — Phase 3–5: AI
+- Provider abstraction + gateway tunggal; AI default **nonaktif**; aktif bila setting + konfigurasi lengkap.
+- Default model Anthropic `claude-opus-5-5` (paling mampu); dapat diganti via AI_MODEL untuk menekan biaya.
+- Endpoint JSON + Alpine (bukan Livewire) agar mudah diuji dan tidak bergantung state komponen.
+- **Bug ditemukan oleh test sebelum rilis:** redaksi tidak menangkap "Password admin: X" dan "+62 812-…" → pola diperbaiki + unit test.
+- Smoke test end-to-end memakai stub lokal berformat Anthropic Messages API (AI_BASE_URL=127.0.0.1) — tanpa biaya API;
+  `.env` dikembalikan setelahnya, AI dev dinonaktifkan kembali.
+- Hasil: 224/224 test.

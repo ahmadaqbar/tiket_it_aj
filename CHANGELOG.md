@@ -4,6 +4,17 @@ Format mengikuti [Keep a Changelog](https://keepachangelog.com/id-ID/1.1.0/).
 
 ## [Unreleased]
 
+## [0.6.0] — 2026-11-22 — Phase 3–5: AI Foundation, AI Ticket Assistance, AI Knowledge Base
+### Ditambahkan
+- `config/ai.php`, tabel `ai_requests` (metadata saja), `AiProvider` (Anthropic, OpenAI-compatible, Fake), `AiManager`, `AiGateway`
+  (aktif/nonaktif, rate limit per user & harian, timeout, error handling), `AiContextBuilder` (redaksi, data tak tepercaya), `AiJson`.
+- Asisten AI di detail tiket IT: klasifikasi (isi ke form, tidak tersimpan otomatis), troubleshooting dengan rujukan KB tervalidasi,
+  ringkasan, draf balasan 4 gaya (masuk ke form, tidak terkirim otomatis).
+- Tanya Knowledge Base (`/kb/tanya`) dengan referensi tervalidasi dan penanda "saran umum" bila KB tidak relevan.
+- Setting `ai.enabled` (default nonaktif); variabel `.env` AI_*; `AI_INTEGRATION_GUIDE.md`.
+### Diperbaiki
+- Artikel terkait tiket tidak lagi memunculkan artikel tak relevan dari kata umum judul (pencarian teks hanya sebagai fallback).
+
 ## [0.5.0] — 2026-11-22 — Phase 2: Knowledge Base
 ### Ditambahkan
 - Tabel `kb_articles` (FULLTEXT index), `kb_tags`, `kb_article_tag`; kategori memakai tabel `categories` tiket.

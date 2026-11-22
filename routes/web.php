@@ -12,7 +12,9 @@ use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\ProfileController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\It\DashboardController as ItDashboardController;
+use App\Http\Controllers\It\TicketAiController;
 use App\Http\Controllers\It\TicketController as ItTicketController;
+use App\Http\Controllers\KnowledgeBaseAiController;
 use App\Http\Controllers\KnowledgeBaseController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PwaController;
@@ -59,6 +61,8 @@ Route::middleware(['auth', 'active'])->group(function () {
         // Knowledge Base: baca untuk semua role (Policy membatasi), tulis untuk IT.
         Route::get('/kb', [KnowledgeBaseController::class, 'index'])->name('kb.index');
         Route::middleware('role:IT,IT_ADMIN')->group(function () {
+            Route::get('/kb/tanya', [KnowledgeBaseAiController::class, 'page'])->name('kb.ask');
+            Route::post('/kb/tanya', [KnowledgeBaseAiController::class, 'ask'])->middleware('throttle:20,1')->name('kb.ask.submit');
             Route::get('/kb/baru', [KnowledgeBaseController::class, 'create'])->name('kb.create');
             Route::post('/kb', [KnowledgeBaseController::class, 'store'])->name('kb.store');
             Route::get('/kb/{article}/ubah', [KnowledgeBaseController::class, 'edit'])->name('kb.edit');
@@ -94,6 +98,8 @@ Route::middleware(['auth', 'active'])->group(function () {
             Route::put('/tiket/{ticket}/pic', [TicketActionController::class, 'assign'])->name('tickets.assign');
             Route::post('/tiket/{ticket}/ambil', [TicketActionController::class, 'take'])->name('tickets.take');
             Route::put('/tiket/{ticket}/klasifikasi', [TicketActionController::class, 'reclassify'])->name('tickets.reclassify');
+            Route::post('/tiket/{ticket}/ai/{feature}', TicketAiController::class)
+                ->whereIn('feature', ['classify', 'troubleshoot', 'summary', 'reply'])->middleware('throttle:20,1')->name('tickets.ai');
         });
 
         // ROLE: IT ADMIN

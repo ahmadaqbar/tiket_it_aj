@@ -135,8 +135,10 @@ class KnowledgeBaseService
         if ($results->count() < $limit) {
             $results = $results->merge($base()->where('category_id', $ticket->category_id)->whereNotIn('id', $results->pluck('id'))->latest('updated_at')->limit($limit - $results->count())->get());
         }
-        if ($results->count() < $limit) {
-            $results = $results->merge($this->search($base(), $ticket->title)->whereNotIn('kb_articles.id', $results->pluck('id'))->limit($limit - $results->count())->get());
+        // Pencarian teks hanya bila tidak ada artikel sekategori — kata umum di judul (mis. "tidak")
+        // dapat memunculkan artikel yang tidak relevan.
+        if ($results->isEmpty()) {
+            $results = $this->search($base(), $ticket->title)->limit($limit)->get();
         }
 
         return $results->unique('id')->take($limit)->values();

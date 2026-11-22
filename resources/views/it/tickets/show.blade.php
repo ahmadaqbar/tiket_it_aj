@@ -50,6 +50,8 @@
         </div>
 
         <aside class="space-y-6">
+            <x-ticket.ai-panel :ticket="$ticket" :unavailable="$aiUnavailable" :styles="$replyStyles" />
+
             {{-- Status --}}
             @if ($allowedStatuses !== [])
                 <form method="POST" action="{{ route('it.tickets.status', $ticket) }}" class="card space-y-3 p-5" x-data="{ status: '{{ old('status', $allowedStatuses[0]->value) }}' }">
@@ -83,11 +85,13 @@
 
                 {{-- Klasifikasi --}}
                 <form method="POST" action="{{ route('it.tickets.reclassify', $ticket) }}" class="card space-y-3 p-5"
-                      x-data="{ categoryId: '{{ $ticket->category_id }}', subId: '{{ $ticket->subcategory_id }}', cats: @js($categoryData) }">
+                      x-data="{ categoryId: '{{ $ticket->category_id }}', subId: '{{ $ticket->subcategory_id }}', priority: '{{ $ticket->priority->value }}', cats: @js($categoryData), aiFilled: false }"
+                      @ai-classify.window="if ($event.detail.priority) priority = $event.detail.priority; if ($event.detail.category_id) { categoryId = String($event.detail.category_id); subId = $event.detail.subcategory_id ? String($event.detail.subcategory_id) : ''; } aiFilled = true; $el.scrollIntoView({ behavior: 'smooth', block: 'center' })">
                     @csrf @method('PUT')
                     <h2 class="text-sm font-semibold text-gray-900">Klasifikasi</h2>
-                    <select name="priority" class="form-input" aria-label="Prioritas">
-                        @foreach ($priorities as $p)<option value="{{ $p->value }}" @selected($ticket->priority === $p)>{{ $p->label() }}</option>@endforeach
+                    <p x-show="aiFilled" x-cloak class="rounded bg-brand-50 px-2 py-1 text-xs text-brand-800">Diisi dari saran AI — periksa lalu tekan Simpan.</p>
+                    <select name="priority" class="form-input" aria-label="Prioritas" x-model="priority">
+                        @foreach ($priorities as $p)<option value="{{ $p->value }}">{{ $p->label() }}</option>@endforeach
                     </select>
                     <select name="category_id" class="form-input" aria-label="Kategori" x-model="categoryId" @change="subId = ''">
                         @foreach ($categories as $c)<option value="{{ $c->id }}">{{ $c->name }}</option>@endforeach

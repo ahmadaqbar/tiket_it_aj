@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Models\User;
+use App\Services\Ai\AiManager;
+use App\Services\Ai\AiProvider;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -18,7 +20,8 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        //
+        // Provider AI dibuat dari konfigurasi; test mengganti binding ini dengan FakeAiProvider.
+        $this->app->bind(AiProvider::class, fn ($app) => $app->make(AiManager::class)->makeProvider());
     }
 
     public function boot(): void

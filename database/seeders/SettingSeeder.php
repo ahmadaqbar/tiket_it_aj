@@ -13,6 +13,7 @@ class SettingSeeder extends Seeder
         ['upload.max_kb', '5120', 'int', 'Ukuran maksimum lampiran (KB)'],
         ['upload.max_files', '5', 'int', 'Jumlah maksimum lampiran per kiriman'],
         ['kb.public_enabled', '1', 'bool', 'Pusat bantuan (artikel publik) dapat diakses user'],
+        ['ai.enabled', '0', 'bool', 'Asisten AI aktif'],
         ['organization.name', 'PT Almega Jaya Group', 'string', 'Nama organisasi'],
     ];
 

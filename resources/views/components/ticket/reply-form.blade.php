@@ -1,6 +1,7 @@
 @props(['ticket', 'templates' => collect(), 'canInternal' => false, 'internalOnly' => false, 'maxKb' => 5120, 'maxFiles' => 5])
 <form method="POST" action="{{ route('tickets.reply', $ticket) }}" enctype="multipart/form-data" class="space-y-3"
-      x-data="{ visibility: '{{ $internalOnly ? 'INTERNAL' : old('visibility', 'PUBLIC') }}', message: @js(old('message', '')), sending: false }" @submit="sending = true">
+      x-data="{ visibility: '{{ $internalOnly ? 'INTERNAL' : old('visibility', 'PUBLIC') }}', message: @js(old('message', '')), sending: false }" @submit="sending = true"
+      @if (! $internalOnly) @ai-draft.window="visibility = 'PUBLIC'; message = $event.detail.text; $nextTick(() => { $refs.msg.focus(); $refs.msg.scrollIntoView({ behavior: 'smooth', block: 'center' }) })" @endif>
     @csrf
 
     @if ($internalOnly)

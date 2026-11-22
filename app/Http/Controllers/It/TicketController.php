@@ -11,6 +11,8 @@ use App\Models\QuickReplyTemplate;
 use App\Models\Ticket;
 use App\Models\Unit;
 use App\Models\User;
+use App\Services\Ai\AiManager;
+use App\Services\Ai\TicketAiService;
 use App\Services\AttachmentService;
 use App\Services\AuditService;
 use App\Services\KnowledgeBaseService;
@@ -69,6 +71,8 @@ class TicketController extends Controller
             'maxKb' => $attachments->maxKilobytes(),
             'maxFiles' => $attachments->maxFiles(),
             'relatedArticles' => $kb->relatedForTicket($ticket, $request->user()),
+            'aiUnavailable' => app(AiManager::class)->unavailableReason(),
+            'replyStyles' => TicketAiService::REPLY_STYLES,
         ]);
     }
 

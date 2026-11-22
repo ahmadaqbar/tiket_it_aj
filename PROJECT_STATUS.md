@@ -22,7 +22,7 @@ Terakhir diperbarui: 2026-11-22 (setelah Phase 1c). Legenda: ✅ selesai & teruj
 | Notification (in-app) | ✅ | Database channel sinkron, lonceng Livewire polling 60 dtk, halaman notifikasi |
 | PWA-ready | ✅ | Manifest dinamis, ikon, service worker offline minimal |
 | Knowledge Base | ✅ | Artikel, tag, visibilitas, Draft/Published/Archived, FULLTEXT + fallback, artikel terkait tiket, "jadikan artikel" dari tiket |
-| AI Assistant | ⏳ | Phase 3–5 |
+| AI Assistant (opsional) | ✅ | Provider Anthropic & OpenAI-compatible; klasifikasi, troubleshooting, ringkasan, draf balasan, tanya KB; default nonaktif |
 | Product settings / branding | ⏳ | Phase 6 |
 | Analytics & Recurring Issues | ⏳ | Phase 7 |
 | Reporting PDF/Excel | ⏳ | Phase 7 |
