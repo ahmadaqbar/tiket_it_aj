@@ -21,19 +21,30 @@
 2. Jika subdomain sudah ada, ubah document root-nya ke `almega-it/public` (atau minta ke penyedia hosting).
 3. `.env`, `vendor/`, dan `storage/` otomatis berada di luar web root.
 
-## 3. Metode B (Alternatif): Document Root Tidak Dapat Diubah
+## 3. Metode B: Document Root Hanya Boleh di Dalam `public_html`
 
-Jika subdomain terkunci ke `/home/<user>/public_html/it` (contoh):
-1. Upload aplikasi ke `/home/<user>/almega-it/` (di luar `public_html`).
-2. Salin **isi** `almega-it/public/` ke `public_html/it/`.
-3. Edit `public_html/it/index.php`:
-   ```php
-   require __DIR__.'/../../almega-it/vendor/autoload.php';
-   $app = require_once __DIR__.'/../../almega-it/bootstrap/app.php';
-   ```
-   (sesuaikan path pada baris `maintenance.php` juga)
-4. Setiap kali `npm run build`, salin ulang `public/build/` ke `public_html/it/build/`.
+Banyak cPanel hanya mengizinkan document root di bawah `public_html`. Aplikasi **tetap** di luar `public_html`;
+hanya isi folder `public` yang ditempatkan di `public_html`.
+
+```
+/home/<user>/almega-it/          ← aplikasi (app, vendor, .env, storage, …) — TIDAK publik
+/home/<user>/public_html/it/     ← document root subdomain: isi almega-it/public + index.php khusus
+```
+
+1. Domains → subdomain `it.almegajaya.com` → Document Root: `public_html/it`.
+2. File Manager: salin **seluruh isi** `almega-it/public/` (termasuk `.htaccess`, `build/`, `icons/`, `sw.js`, `offline.html`)
+   ke `public_html/it/`. Folder `almega-it/public/` **jangan dihapus**.
+3. Timpa `public_html/it/index.php` dengan `almega-it/deploy/shared-hosting/index.php`. File ini mengarah ke
+   `../../almega-it` dan memanggil `$app->usePublicPath(__DIR__)` agar asset build, ikon, dan manifest terbaca dari `public_html/it`.
+   Bila nama folder aplikasi berbeda, ubah `$appPath` di baris atas file.
+4. Setiap update versi: salin ulang `almega-it/public/build/` → `public_html/it/build/` (dan file lain di `public/` bila berubah).
 5. **Jangan pernah** meletakkan seluruh folder Laravel di dalam `public_html`.
+
+Alternatif bila hosting mengizinkan symlink: `ln -s /home/<user>/almega-it/public /home/<user>/public_html/it`
+(lewat Terminal atau cron sekali jalan, dengan folder `public_html/it` belum ada). Metode salin di atas lebih aman untuk semua hosting.
+
+Diuji: struktur ini disimulasikan (aplikasi di luar docroot, docroot berisi salinan `public` + `index.php` khusus) —
+halaman, asset CSS/JS, login, dan grafik analytics berjalan; `/.env` → 404.
 
 ## 4. Persiapan Paket (di komputer lokal / Windows)
 
